@@ -1,0 +1,22 @@
+project:
+  type: book
+
+book:
+  title: "Python Foundation Course - ZeOmega"
+  author: "Anand Chitipothu"
+  date: "5/13/2024"
+  chapters:
+    - index.qmd
+    - syllabus.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
+

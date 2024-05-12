@@ -1,0 +1,5 @@
+# Preface {.unnumbered}
+
+Welcome to the Python Foundation Course.
+
+Python Foundation Course is a hands-on training to learn the essentials of the Python programming language, understand the best practices and idioms of the language.

@@ -1,0 +1,42 @@
+# Course Outline {.unnumbered}
+
+## Syllabus
+
+### Day 1: Introduction to Python
+
+- Getting started
+- The program structure
+- Data structures
+- Control structures
+
+### Day 2: Solving Problems with Python
+
+- Working with files
+- Working with APIs
+- Working with text
+- Writing command-line applications
+
+### Day 3: Professional Software Development with Python
+
+- Classes & Exceptions
+- Organizing Python code
+- Testing Python programs
+- Writing maintainable code
+- Logging
+
+### Day 4: Working with SQL and SQLAlchemy
+
+- Working with databases
+- Introduction to SQLAlchemy
+- Composing queries using SQLAlchemy
+- Understaing query performance
+
+### Day 5: Advanced Python and Best Practices
+
+- Introduction to new features of Python 3
+- Decorators
+- Iterators and generators
+- Dataclasses
+- Static typing
+- Context managers
+- Writing maintainable code
