@@ -115,10 +115,11 @@ class Problem:
     def notify_status(self, status):
         url = "https://engage.pipal.in/api/method/jupyter-problem-tracker"
         data = {
-            "training": "arcesium-python",
+            "training": "zeomega-python",
             "user": os.getenv("USER"),
             "problem": self.name,
-            "status": status
+            "status": status,
+            "output": "\n".join(self.logger.lines)
         }
         requests.post(url, json=data).json()
 
