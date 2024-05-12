@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import shutil
 import yaml
+import argparse
 
 def symlink(target, path, force=True):
     """Creates the path a symlink to the target.
@@ -30,10 +31,10 @@ def run_cmd(cmd):
     subprocess.run(cmd, shell=True)
 
 def tljh_config():
-    yaml.safe_load(open("/opt/tljh/config/config.yaml"))
+    return yaml.safe_load(open("/opt/tljh/config/config.yaml"))
 
-def setup_livenotes():
-    print
+def setup_livenotes(domain):
+    print()
     print("Setting up live notes service")
     symlink("/opt/training/etc/systemd/system/live-notes.service", "/etc/systemd/system/")
 
@@ -41,7 +42,6 @@ def setup_livenotes():
     systemctl("enable", "live-notes.service")
     systemctl("start", "live-notes.service")
 
-    domain = "notes.arcesium-lab.pipal.in"
     print(f"  setting up the domain {domain} ...")
     config = tljh_config()
 
@@ -51,22 +51,29 @@ def setup_livenotes():
     # XXX: using cp as symlinking the file is not working
     shutil.copy("/opt/training/etc/tljh/state/rules/live-notes.toml", "/opt/tljh/state/rules/")
 
-    run_cmd("tljh-config reload proxy"
-    print(f"  The live notes will be live at https://$domain/ in a couple of seconds.")
+    run_cmd("tljh-config reload proxy")
+    print(f"  The live notes will be live at https://{domain}/ in a couple of seconds.")
 
 def setup_magic_commands():
     # Setup /etc/skel so that new users will have startup script setup in their home dir
     # at ~/.ipython/profile_default/startup
     skel = Path(ROOT) / "etc" / "skel"
-    shutil.copytree(skel, "/etc/skel")
+    shutil.copytree(skel, "/etc/skel", dirs_exist_ok=True)
+
+p = argparse.ArgumentParser()
+p.add_argument("--domain", 
+               default="live.lab.pipal.in",
+               help="live notes domain name")
+args = p.parse_args()
+
 
 ROOT = Path(__file__).parent.parent
 
 print(f"The traning repo is at: {ROOT}")
 
-echo "symlinking to /opt/training ..."
+print("symlinking to /opt/training ...")
 symlink(ROOT, "/opt/training", force=True)
 run_cmd("ls -l /opt/training")
 
-setup_livenotes()
+setup_livenotes(args.domain)
 setup_magic_commands()
