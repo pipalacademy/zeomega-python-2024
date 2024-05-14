@@ -7,6 +7,9 @@ from IPython import get_ipython
 from IPython.display import display
 from IPython.core.magic import Magics, magics_class, line_magic, needs_local_scope
 
+import ipykernel
+from jupyter_server import serverapp as app
+
 from pathlib import Path
 import subprocess
 import yaml
@@ -36,6 +39,25 @@ def create_new_cell(contents):
         replace=False,
     )
     shell.payload_manager.write_payload(payload, single=False)
+
+def _get_kernel_id():
+    path = ipykernel.get_connection_file()
+    return os.path.basename(path).split("-", 1)[1].replace(".json", "")
+
+def _get_notebook_name():
+    """Return the name of the notebook file.
+    """   
+    try:
+        kid = _get_kernel_id()
+        
+        for s in app.list_running_servers():
+            url = s['url'] + "api/sessions"
+            notebooks = requests.get(url, params={"token": s['token']}).json()
+            for nb in notebooks:
+                if nb['kernel']['id'] == kid:
+                    return nb['notebook']['path']
+    except Exception:
+        pass
 
 PROBLEM_ROOT = "/opt/training/problems"
 
@@ -117,6 +139,7 @@ class Problem:
         data = {
             "training": "zeomega-python",
             "user": os.getenv("USER"),
+            "notebook": _get_notebook_name(),
             "problem": self.name,
             "status": status,
             "output": "\n".join(self.logger.lines)
@@ -141,10 +164,10 @@ class Problem:
         passed = True
 
         checks = self.read_checks()
+        print("Found", len(checks), "checks")
         for check in checks:
             check_passed = check.run(env)
             passed = passed and check_passed
-            #print(passed, check.name)
 
         if passed:
             self.logger.log(f"🎉 Congratulations! You have successfully solved problem {self.name}!!")
@@ -244,7 +267,7 @@ class CommandCheck(Check):
         self.test = spec.get("test")
 
     def process_expected_output(self, expected_output, sort_output):
-        if not expected_output:
+        if expected_output is None:
             return None
         if isinstance(expected_output, dict):
             cmd = expected_output['command']
@@ -252,7 +275,7 @@ class CommandCheck(Check):
             cmd = cmd.format(PROBLEM_ROOT=self.problem.root)
 
             p = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, text=True)
-            return p.stdout.strip()
+            return self.ignore_trailing_space(p.stdout.strip("\n"))
         else:
             return expected_output.strip("\n")
 
@@ -274,6 +297,7 @@ class CommandCheck(Check):
 
         if self.sort_output:
             output = self.sort_output_lines(output)
+
         if self.expected_output is not None:
 
             # XXX-Anand: Work-around to deal with YAML when there are leading spaces in the first line
@@ -289,10 +313,12 @@ class CommandCheck(Check):
                 self.logger.log(f"Expected:\n{self.expected_output_print}")
                 self.logger.log(f"Found:\n{output_print}")
                 return False
-
-        if self.test:
+        elif self.test:
             self.stdout = output
             return self.run_test()
+        else:
+            return True
+
 
     def run_test(self):
         try:
