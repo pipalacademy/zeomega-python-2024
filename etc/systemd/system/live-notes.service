@@ -12,8 +12,9 @@ User=jupyter-anand
 Group=jupyter-anand
 Type=simple
 Restart=always
-WorkingDirectory=/opt/training
+WorkingDirectory=/opt/training/book
 ExecStart=quarto preview --port 4444
+Environment="PATH=/opt/tljh/user/bin:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
 
 [Install]
 WantedBy=multi-user.target
