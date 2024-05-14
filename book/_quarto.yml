@@ -20,6 +20,7 @@ book:
       chapters:
         - live-notes/day1.ipynb
         - live-notes/day2.ipynb
+        - live-notes/day3.ipynb
 
 bibliography: references.bib
 
