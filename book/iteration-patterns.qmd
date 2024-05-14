@@ -1,0 +1,104 @@
+---
+execute: 
+  enabled: true
+  cache: true
+---
+# Iteration Patterns
+
+Let's look at commonly used iteration patterns in Python.
+
+## Iterating over a list
+
+This is the most common pattern and you've seen it already.
+
+```{python}
+x = ["a", "b", "c", "d"]
+for a in x:
+    print(a, a.upper())
+```
+
+We could use the same pattern with a list comprehension as well.
+
+```{python}
+[a.upper() for a in x]
+```
+
+## Iterating over a sequence of numbers
+
+We can use the `range` function to iterate over a sequence of numbers.
+
+```{python}
+for i in range(5):
+    print(i, i*i)
+```
+
+And the same pattern as a list comprehension:
+
+```{python}
+[i*i for i in range(5)]
+```
+
+## Iterating over two lists together
+
+The built-in function `zip` can be used to iterate over two lists togetger.
+
+```{python}
+names = ["a", "b", "c", "d"]
+scores = [10, 20, 30, 40]
+
+for name, score in zip(names, scores):
+    print(name, score)
+```
+
+## Iterating over the index and the element together
+
+There would be times when we need to use both the index and the element when iterating over a list. While it is possible to use `range(len(x))` to iterate over the index and use the index to access the element, that is quite clumsy. Python provides a built-in function called `enumerate` to address this.
+
+Let's say we have a list of chapter titles.
+
+```{python}
+chapters = [
+    "Getting Started",
+    "Functions",
+    "Lists",
+    "Dictionaries"
+]
+```
+
+And we want to print the chapter number and title together.
+
+```{python}
+for i, title in enumerate(chapters):
+    print("Chapter", i, title)
+```
+
+We may want the chapter number to start from 1. We could print `i+1` instead of `i`.
+
+```{python}
+for i, title in enumerate(chapters):
+    print("Chapter", i+1, title)
+```
+
+Or we can just tell `enumerate` to start counting from `1` instead of `0`.
+
+```{python}
+for i, title in enumerate(chapters, start=1):
+    print("Chapter", i, title)
+```
+
+We can also use this pattern in list comprehensions.
+
+```{python}
+[f"Chapter {i}: {title}" for i, title in enumerate(chapters, start=1)]
+```
+
+## Exercises
+
+**Problem:** write a function `vector_add` to add two vectors.
+
+```python
+>>> vector_add([1, 2, 3, 4], [10, 20, 30, 40])
+[11, 22, 33, 44]
+>>> sum(vector_add([1, 2, 3, 4], [10, 20, 30, 40]))
+110
+```

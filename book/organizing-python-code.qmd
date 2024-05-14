@@ -1,0 +1,397 @@
+# Organizing Python Code
+
+In this chapter, we'll learn how to manage:
+
+* dependencies
+* tests
+* documentation
+
+for Python projects.
+
+We'll also see how to organize python code for:
+
+* small python applications
+* medium-sized/large applications
+* python packages/libraries
+
+## Tools
+
+**Managing Dependencies**
+
+* pip
+* virtualenv
+
+**Testing**
+
+* pytest
+
+**Documentation**
+
+* Sphinx
+* mkdocs-material
+* mdbook
+
+## Pip
+
+Python maintains the list of packages at [pypi.org](https://pypi.org/).
+
+`pip` is the tool to install a python package from pypi. Pip comes with standard python installation.
+
+```
+$ pip --version
+pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
+```
+
+If `pip` is not in the path, try using it with `python -m pip` instead.
+
+```
+$ python -m pip --version
+pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
+```
+
+### Installing Packages
+
+You can install a python package from pypi using:
+
+```
+$ pip install Flask
+$ pip install Flask==2.2.3
+$ pip install 'Flask>=2.2'
+```
+
+That would install the package:
+* in the virtualenv if you are using one
+* system-wide if you have write access to the system python directories
+* user installation directory (`$HOME/.local/lib/python3.XX/site-packages`)
+
+Pip also supports installing dependencies from `requirements.txt` file.
+
+```
+$ pip install -r requirements.txt
+```
+
+We'll see more about this in the _Organizing Python Code_ part.
+
+### Exercise
+
+Install a third-party library `tabulate`, a library for printing nicely formatted tables to console.
+
+```
+$ pip install tabulate
+```
+
+After installing it try using it:
+
+```python
+from tabulate import tabulate
+
+headers = ['Name', 'Price', 'Quantity', 'Amount']
+data = [
+    ['Apple', 30, 3, 90],
+    ['Banana', 4, 12, 48],
+    ['Mango', 70, 5, 350]
+]
+
+print(tabulate(data, headers=headers))
+```
+
+## Virtualenv
+
+When working on multiple projects, each project will have it's own dependencies and there could be conflicting dependencies between projects.
+
+Virtualenv is a tool for creating a seperate python environment for each project.
+
+
+_Note: If you are trying the following from a jupyterlab, try doing it in a Terminal._
+
+Create a new virtualenv.
+
+```
+$ python -m venv testenv
+```
+
+Once you have created the virtualenv, you activate it using:
+
+```
+$ source testenv/bin/activate
+(testenv)$ which python
+/home/anand/testenv/bin/python
+```
+
+As you can see the Python is now coming from the virtualenv.
+
+Please note that you'll have to activate the virtualenv everytime you open a new terminal.
+
+If we install any package now, it will be installed in testenv.
+
+Try installing a package.
+
+```
+(testenv)$ pip install Flask
+...
+(testenv)$ which flask
+/home/anand/testenv/bin/flask
+(testenv)$ flask --version
+Python 3.10.6
+Flask 2.2.3
+Werkzeug 2.2.3
+```
+
+You can deactivate a virtualenv using the `deactivate` command.
+
+```
+(testenv)$ deactivate
+$
+$ which python
+/usr/bin/python
+```
+
+## Small Python Applications
+
+Here is a typical structure for small python applications:
+
+```
+myapp/
+    README.md
+    requirements.txt
+    webapp.py
+    utils.py
+    runtests.sh
+    tests/
+        test_utils.py
+```
+
+### Dependencies
+
+The dependencies are specified in `requirements.txt`
+
+```
+Flask>=2.2
+gunicorn
+pytest
+```
+
+We typically start with creating a virtualenv. I usually call my virtualenv as `venv`.
+
+```
+$ python -m venv venv
+$ source venv/bin/activate
+```
+
+And install all the dependencies.
+
+```
+(venv) $ pip install -r requirements.txt
+```
+
+### Code
+
+The code is written in python files in the root directory.
+
+```
+webapp.py
+utils.py
+```
+
+### Tests
+
+Tests are written in `tests/` directory and each test file will start with prefix `test_`. Usually there will be one test file for each source file.
+
+You can run the tests using:
+
+```
+(venv) $ pytest tests
+```
+
+I find it handy to include a `runtests.sh` script.
+
+```
+#! /bin/bash
+py.test tests/ $*
+```
+
+Make sure the script is executable.
+
+```
+(venv) $ chmod +x runtests.sh
+```
+
+Now, run tests using:
+
+```
+(venv) $ ./runtests.sh
+```
+
+### Documentation
+
+For small applications, it is good enough to include a `README.md` file with instructions to setup and run the application.
+
+### Summary
+
+For a small python application:
+
+* Write a `README.md` file with instructions on how to setup and run the project
+* capture the dependencies in `requirements.txt`
+* write tests in `tests/` directory
+* keep code files in the top-level
+
+
+## Large Python Applications
+
+When you are developing a production application in Python, a little more structure is often useful.
+
+Here is a typical structure for a large python application.
+
+```
+myapp/
+    README.md
+    requirements.txt
+    dev-requirements.txt
+
+    docs/
+        index.md
+        setup.md
+        ...
+
+    myapp/
+        __init__.py
+        app.py
+        utils.py
+        a.py
+        b.py
+
+    run.py
+    runtests.sh
+
+    tests/
+        test_utils.py
+        test_a.py
+        ...
+```
+
+### Dependencies
+
+Unlike small hobby projects, the dependencies are split into two files.
+
+The `requirements.txt` file contains the dependencies to run the application.
+
+The `dev-requirements.txt` file contains the additional dependencies to develop the application. This include the dependencies for testing, documentation etc.
+
+We typically start with creating a virtualenv. I usually call my virtualenv as `venv`.
+
+```
+$ python -m venv venv
+$ source venv/bin/activate
+```
+
+And install all the dependencies.
+
+```
+(venv) $ pip install -r requirements.txt -r dev-requirements.txt
+```
+
+### Code
+
+All the code is put in a module and relative imports are used to import other modules in the same app.
+
+For example, the `myapp/app.py` may have imports as shown below:
+
+```python
+from flask import Flask
+from . import utils
+from .auth import login_required
+
+...
+```
+
+It is often handy to include a `run.py` in the top-level to start the application.
+
+### Tests
+
+As usual, tests go to `tests/` directory and keep a `runtests.sh` script to run tests.
+
+### Documentation
+
+Write instructions on how to setup the application in `README.md` and use `docs/` for more detailed documentation.
+
+You may want to use tools like [Sphinx][], [mkdocs-material][], or [mdbook][] for writing documentation.
+
+While the first two tools are written in Python, _mdbook_ is written in Rust. The [mkdocs-material][] seems to be the popular choice for modern python projects.
+
+[Sphinx]: https://www.sphinx-doc.org/en/master/
+[mkdocs-material]: https://squidfunk.github.io/mkdocs-material/
+[mdbook]: https://rust-lang.github.io/mdBook/
+
+## Python Packages
+
+Let's see what additional things to keep in mind when developing a python package to be used with other applications or an open source package to be published on PyPI.
+
+Python packages include a `setup.py` with the metadata. A typical structure would be:
+
+```
+mypkg/
+    README.md
+    requirements.txt
+    dev-requirements.txt
+    setup.py
+
+    docs/
+        index.md
+        setup.md
+        ...
+
+    mypkg/
+        __init__.py
+        core.py
+        utils.py
+        cli.py
+        a.py
+        b.py
+
+    runtests.sh
+
+    tests/
+        test_utils.py
+        test_a.py
+        ...
+```
+
+Structure is similar to that of a large project except that it includes a setup.py.
+
+### The `setup.py`
+
+The `setup.py` contains the metadata to publish the package to pypi.
+
+```python
+from setuptools import setup
+
+setup(
+    name='mypkg',
+    version='0.1.0',
+    description="Description of the package",
+    author="Alice",
+    author_email="alice@example.com",
+    packages=['mypkg'],
+    install_requires=["dep1", "dep2"]
+)
+```
+
+### Including Scripts
+
+For some packages, you may want to install a script along with the distribution. You can do that my including `entry_points` in the `setup.py`:
+
+```python
+    entry_points={
+        "console_scripts": [
+            "mycmd = mypkg.cli:main"
+        ]
+    }
+```
+
+### Building
+
+For pure python packages, it would be easier to build a source distrubution.
+
+```
+$ python setup.py sdist
+```

@@ -8,7 +8,14 @@ book:
   chapters:
     - index.qmd
     - syllabus.qmd
-    - references.qmd
+    - taste-of-python.qmd
+    - iteration-patterns.qmd
+    - dictionaries.ipynb
+    - re.qmd
+    - writing-custom-modules.qmd
+    - organizing-python-code.qmd
+    - testing.qmd
+
     - part: Live Notes
       chapters:
         - live-notes/day1.ipynb
@@ -19,8 +26,8 @@ bibliography: references.bib
 format:
   html:
     theme: cosmo
-  pdf:
-    documentclass: scrreprt
+  # pdf:
+  #   documentclass: scrreprt
 
 
 

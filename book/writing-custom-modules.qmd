@@ -1,0 +1,278 @@
+---
+execute: 
+  enabled: true
+  cache: true
+  error: true
+---
+# Writing Custom Modules
+
+Let's create a python file `mymodule.py` with the following content.
+
+```{python}
+%%file mymodule.py
+
+print("BEGIN mymodule")
+x = 2
+
+def add(a, b):
+    return a + b
+
+print(add(3, 4))
+print("END mymodule")
+```
+
+Let's see what happens when we run this file as a script:
+
+```{python}
+!python mymodule.py
+```
+
+Let's see what happens when we import this file as a module.
+
+```{python}
+import mymodule
+```
+
+```{python}
+mymodule.x
+```
+
+```{python}
+mymodule.add(10, 20)
+```
+
+As you can see a python file can be imported as a module and the code in that file gets executed, just the same way when it is run as as script.
+
+The output would be the same if we import the module from another python file or the program is passed directly from python command-line [^python-c].
+
+```{python}
+!python -c "import mymodule; print(mymodule.add(10, 20))"
+```
+
+## Reimporting a module
+
+The code of the module is executed only once even if the module is imported more than once.
+
+```{python}
+import mymodule
+import mymodule
+```
+
+That means, if you make some changes the file of a module after it is imported, you'll not see the changes even if you import it again. 
+
+This is especially annoying when you are working in a Jupyter notebook. 
+
+The work-around to that issue is to reimport a module using `importlib`.
+
+```{python}
+import mymodule
+
+# and make some changes to mymodule.py
+```
+
+```{python}
+import importlib
+importlib.reload(mymodule)
+```
+
+## The `__name__` magic variable
+
+Python has a special variable `__name__`, which is set by the runtime.
+
+The value of the `__name__` will be different in each module or Python file. If a Python file is executed as a script, the value of `__name__` will be `"__main__"`. When a python file is imported as a module, the value of `__name__` would be the module name.
+
+Let's try this with an example.
+
+```{python}
+%%file mymodule2.py
+
+x = 2
+
+def add(a, b):
+    return a+b
+
+print(__name__)
+print(add(3, 4))
+```
+
+```{python}
+!python mymodule2.py
+```
+
+The value of `__name__` is `"__main__"` becasuse the file is executed as a script.
+
+```{python}
+!python -c "import mymodule2"
+```
+
+Since we have now imported the file as a mofule, the value of `__name__` is `"mymodule2"`, the name of the module.
+
+If you notice, the module is printing the value of add(3, 4) even when the file is imported as a module, which is not desirable. How do we stop it?
+
+```{python}
+%%file mymodule3.py
+
+x = 2
+
+def add(a, b):
+    return a+b
+
+# run the following only when this file is run as a script
+if __name__ == "__main__":
+    print(add(3, 4))
+```
+
+We could check if the program is run as a script by using the condition `if __name__ == "__main__":` and then only run whatever we want to run it when the file is used as a script.
+
+### Example: square module
+
+```{python}
+%%file sq.py
+import sys
+
+def square(x):
+    return x*x
+
+def main():
+    n = int(sys.argv[1])
+    print(square(n))
+
+if __name__ == "__main__":
+    main()
+```
+
+```{python}
+!python sq.py 5
+```
+
+```{python}
+import sq
+sq.square(5)
+```
+
+## Docstrings
+
+Let's see how to find help with Python modules and functions and how to make our modules provide such help.
+
+```{python}
+import os
+```
+
+```{python}
+help(os.listdir)
+```
+
+### Adding docstrings to a function
+
+We can add docstrings to a function by adding a string as the first line of the function.
+
+```{python}
+def add(x, y):
+    "Adds two numbers"
+    return x+y
+```
+
+```{python}
+add(3, 4)
+```
+
+```{python}
+help(add)
+```
+
+Typically, triple quotes are used to write docstrings as they allow writing docstring in multiple lines. Also, it is often useful to include an example of how the function can be used.
+
+```{python}
+def add(x, y):
+    """Adds two numbers.
+
+        >>> add(3, 4)
+        7
+    """
+    return x+y
+```
+
+```{python}
+help(add)
+```
+
+### Using typehints
+
+Python3 supports adding typehints to funtions. It is often very useful to include typehints for function as they are shown as part of the documentation.
+
+```{python}
+def add(x: int, y: int) -> int:
+    """Adds two numbers.
+
+        >>> add(3, 4)
+        7
+    """
+    return x+y
+```
+
+```{python}
+help(add)
+```
+
+### Adding docstrings to a module
+
+Docstrings can also be added a module, just like how they are added to a function. Just add a string at the beginning of the file.
+
+Let's add docstrings to the `sq` module that we wrote earlier.
+
+```{python}
+%%file sq.py
+"""
+The square module.
+
+The square module provides a function to compute square of a number.
+
+This can also be used as a script.
+
+USAGE:
+
+    $ python sq.py 4
+    16
+"""
+import sys
+
+def square(n: int) -> int:
+    """Computes square of a number.
+    
+        >>> square(4)
+        16
+    """
+    return n*n
+
+def main():
+    n = int(sys.argv[1])
+    print(square(n))
+    
+if __name__ == "__main__":
+    main()
+```
+
+We may have to reimport the module as it may have been imported earlier.
+
+```{python}
+import sq
+import importlib
+
+importlib.reload(sq)
+```
+
+The reload was required because we were modifying the file of a module that was already imported earlier. You don't have to do this, if you make a new module.
+
+Now that we have the docstrings ready for the `sq` module, let's look at the help.
+
+```{python}
+help(sq)
+```
+
+Or help just on one function.
+
+```{python}
+help(sq.square)
+```
+
+[^python-c]:  The python command-line flag `-c` allows the program directly from the command line. It is handy to quickly try some small snippets of code. Then the code is multiple statements, they are usually seperated by a semi-comon.

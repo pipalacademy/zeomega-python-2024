@@ -1,3 +1,5 @@
 /.quarto/
 _book/
 .ipynb_checkpoints/
+__pycache__/
+.jupyter_cache/

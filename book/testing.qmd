@@ -1,0 +1,108 @@
+---
+execute: 
+  enabled: true
+  cache: true
+  error: true
+---
+
+# Testing Python Programs
+
+All of us know that it is important to test our programs to verify their correctness. 
+
+## Testing - Naive Approach
+
+Most often we call the code a couple of times and feel satifisied that is working fine.
+
+For example, we are writing a square function.
+
+```{python}
+def square(n):
+    return n*n
+```
+
+We could try calling it once with known value and verify that it is working correctly.
+
+```{python}
+square(4)
+```
+
+That gave an answer 16. Looks like that is correct!
+
+How do we know if the program continues to work correctly even when parts of codebase continuously gets changed over time? 
+
+Who will remember that we need to call `square(4)` and verify that the result is 16?
+
+That's where automatic test cases comes handy.
+
+## Unit testing with `pytest`
+
+pytest is a popular third-party library in Python that makes testing very simple and fun.
+
+With pytest, we write a test function using assert statements. When we run `pytest` it picks all the functions that start with a prefix `test` and executes all of them.
+
+```{python}
+%%file square.py
+
+def square(n):
+    return n*n
+
+def test_square():
+    assert square(4) == 16
+```
+
+And we run the tests by running `pytest` command.
+
+```{python}
+!pytest square.py
+```
+
+It shows a dot for each test and doesn't print anything if the test is successful. 
+
+We can get more detailed output by enabling verbose mode with flag `-v`.
+
+```{python}
+!pytest -v square.py
+```
+
+### Seperating application and test code
+
+Often it is handy to seperate the application code and test code. 
+
+It is convention to use a prefix `test_` for all test files.
+
+```{python}
+%%file square.py
+def square(n):
+    return n*n
+```
+
+```{python}
+%%file test_square.py
+
+from square import square
+
+def test_square():
+    assert square(4) == 16
+```
+
+Now we can run `pytest`.
+
+```{python}
+!pytest -v test_square.py
+```
+
+If there are more test functions, pytest would run them all. 
+
+We can even give directory as argument to pytest, then it would run tests from all files that start with a prefix test.
+
+```{python}
+!pytest . -v
+```
+
+We could even omit if the path is the current directoy. pytest will happily run all the tests in the current directory.
+
+```{python}
+!pytest -v
+```
+
+

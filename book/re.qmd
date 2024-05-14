@@ -1,0 +1,97 @@
+# Regular Expressions
+
+Regular expressions are a mini language for pattern matching. They are used in searching for patterns of text, replacing a pattern with another etc.
+
+In Python, the built-in module `re` provides support for regular expressions.
+
+## Introduction
+
+Suppose we want to find all the numbers in a sentence.
+
+```{python}
+sentence = "10 apples and 20 mangoes"
+```
+
+It would be too cumbersome to do that with usual programming techniques.
+
+Let's see how we can do that using regular expressions.
+
+```{python}
+import re
+```
+
+```{python}
+re.findall("\d+", sentence)
+```
+
+In the above example, the pattern `\d` matches any digit and `\d+` matches one or more digits. We'll learn more about the syntax of regular expressions in a while.
+
+Suppose we want to mask all the numbers in a sentence.
+
+```{python}
+re.sub("\d", "X", sentence)
+```
+
+## Syntax
+
+Regular expressions contain both simple and special characters. Simple characters like
+
+**1. Simple characters match themselves**
+
+
+## The Python API
+
+The `re` module provides the following functions to work with regular expressions.
+
+**findall**
+
+Finds all the occurances of a pattern in a string.
+
+```{python}
+re.findall("\d+", "10 apples and 20 mangoes")
+['10', '20']
+```
+
+**match**
+
+Match a regular expression at the beginning of a string.
+
+**search**
+
+**sub**
+
+**split**
+
+**compile**
+
+## Advanced Usage
+
+
+## Example: Parse git log
+
+## Example: Extract Links
+
+## Problems
+
+**Problem:** Write a function `squeeze` to replace multiple continuous whitespace with a single space.
+
+```
+>>> squeeze("a  b    c d")
+'a b c d'
+```
+
+**Problem:** Write a function `make_slug` that takes title as argument and converts that into a nice name that can be used as part of URL. Make sure the the slug is in lower case.
+
+```
+>>> make_slug("Advanced python")
+'advanced-python'
+>>> make_slug("Hello, World!")
+'hello-world'
+>>> make_slug("1 + 2 = 3 !")
+'1-2-3'
+>>> make_slug("https://google.com/")
+'https-google-com'
+```
+
+Other Problems:
+- runlength encoding
