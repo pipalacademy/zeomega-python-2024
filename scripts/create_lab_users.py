@@ -54,18 +54,28 @@ def logout(driver, username):
     driver.get(f"{base_url}/user/{username}/logout/")
 
 
+# XXX-Anand May 2024
+# TLJH's default authenticator has support to let users choose a password when they first log in.
+# Once that is enabled, we just need to login to create the user. 
+#
+# Please call this script after setting auth.FirstUseAuthenticator.create_users to true. 
+# Set that back to false after running this script.
+#
+# References:
+# https://tljh.jupyter.org/en/latest/howto/auth/firstuse.html
+#
 def create_user(username, password):
     driver = get_driver()
-    signup(driver, username, password)
+    #signup(driver, username, password)
 
-    login(driver, admin, adminpassword)
-    authurl = f"{base_url}/hub/authorize/{username}"
-    driver.get(authurl)
-    logout(driver, admin)
+    # login(driver, admin, adminpassword)
+    # authurl = f"{base_url}/hub/authorize/{username}"
+    # driver.get(authurl)
+    # logout(driver, admin)
 
     login(driver, username, password)
-    time.sleep(4)
-    logout(driver, username)
+    # time.sleep(4)
+    # logout(driver, username)
     driver.close()
 
 
