@@ -1,5 +1,21 @@
-# Preface {.unnumbered}
+# Welcome {.unnumbered}
 
 Welcome to the Python Foundation Course.
 
 Python Foundation Course is a hands-on training to learn the essentials of the Python programming language, understand the best practices and idioms of the language.
+
+## The Lap Setup
+
+A jupyterhub instance is in the cloud is setup for this training which provides a jupyter lab instance for every participant.
+
+You can access it from <https://lab.pipal.in/>.
+
+The username will be your first name in lowercase and the password will be shared with all you in first session.
+
+## Live Notes
+
+The live trianing notes presented by the instuctor will be available live at <https://live.lab.pipal.in/>.
+
+You can use this to browse through the notes if you need to refer to a concept covered a few minutes ago, or look the codes examples covered earlier.
+
+

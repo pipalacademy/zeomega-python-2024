@@ -1,6 +1,4 @@
-# Course Outline {.unnumbered}
-
-## Syllabus
+# Syllabus {.unnumbered}
 
 ### Day 1: Introduction to Python
 

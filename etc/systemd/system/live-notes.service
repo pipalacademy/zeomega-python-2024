@@ -8,8 +8,8 @@ Description=Training Live Notes
 After=multi-user.target
 
 [Service]
-User=anand
-Group=anand
+User=jupyter-anand
+Group=jupyter-anand
 Type=simple
 Restart=always
 WorkingDirectory=/opt/training

@@ -9,6 +9,10 @@ book:
     - index.qmd
     - syllabus.qmd
     - references.qmd
+    - part: Live Notes
+      chapters:
+        - live-notes/day1.ipynb
+        - live-notes/day2.ipynb
 
 bibliography: references.bib
 
