@@ -1,0 +1,4 @@
+Apple 150.0
+Banana 12.0
+Carrot 75.5
+Guava 124.5
