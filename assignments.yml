@@ -50,4 +50,14 @@
 - id: 4
   name: Assignment 04
   problems:
-    - gist-lib
+    - reverse-digits
+    - invertdict
+    - sort-words
+    - barchart
+    - ls-long
+    
+    - unzip
+    - hosts-writer
+    - wget
+    - df
+    - dig
