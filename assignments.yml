@@ -1,0 +1,53 @@
+- id: 1
+  name: Assignment 01
+  problems:
+    - mean
+    - product
+    - digit-count
+    - despace
+    - reverse-words
+    - uppercase
+    - print-header
+    - text-in-a-box
+    - longest-line
+    - line-with-most-words
+
+# Day 2: Practive in class
+# - vector-add
+# - sort-words
+# - grep-command
+
+
+- id: 2
+  name: Assignment 02
+  problems:
+    - sumfile
+    - cumulative-sum
+    - count-increased
+    - group
+    - paste-cmd
+    - center-align
+    - seq
+    - tail
+    - grep
+    - split
+
+- id: 3
+  name: Assignment 03
+  problems:
+    - generate-password
+    - flatten
+    - extcount
+    - sort-cmd
+    - slug
+    
+    - duplicates
+    - run-length-encoding
+    - nominatim
+    - frankfurter
+    - pypi-releases
+
+- id: 4
+  name: Assignment 04
+  problems:
+    - gist-lib
