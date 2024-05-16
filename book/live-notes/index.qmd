@@ -1,0 +1,15 @@
+---
+listing:
+  contents: "*.ipynb"
+  type: table
+  id: sample-listings
+  fields:
+    - title
+---
+
+# Live Notes
+
+Live notes from the class, organized by day.
+
+::: {#sample-listings}
+:::

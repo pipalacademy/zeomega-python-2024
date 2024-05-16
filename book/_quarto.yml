@@ -21,6 +21,7 @@ book:
         - cookbook/dates.qmd
         - cookbook/tabulate.qmd
     - part: Live Notes
+      href: live-notes/index.qmd
       chapters:
         - live-notes/day1.ipynb
         - live-notes/day2.ipynb
