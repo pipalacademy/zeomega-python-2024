@@ -34,10 +34,89 @@ re.sub("\d", "X", sentence)
 
 ## Syntax
 
-Regular expressions contain both simple and special characters. Simple characters like
+A regular expression can have an ordinary or special characters.
 
-**1. Simple characters match themselves**
 
+### Rule 1: Oridinary characters match themselves
+
+```{python}
+re.match("one", "one thousand phones")
+```
+
+```{python}
+re.findall("one", "one thousand phones")
+```
+
+### Rule 2: Special character `.` matches any character
+
+```{python}
+re.match("a.c", "abc")
+```
+
+If we want to match a literal ., we need escape it.
+
+```{python}
+re.match("a\.b", "axb") # no match
+```
+
+```{python}
+re.match("a\.b", "a.b") # match
+```
+
+### Rule 3: Special character | is used to match either of the two patterns
+
+```{python}
+re.match("a|b", "a")
+```
+
+```{python}
+re.match("a|b", "b")
+```
+
+
+```{python}
+re.match("a|b", "c")
+```
+
+```{python}
+re.findall("apple|mango|banana", "10 apples and 20 mangoes")
+```
+
+### Rule 4: A character group
+
+A character group matches any of the characters in thr group.
+
+```{python}
+re.match("a[bc]", "ab")
+```
+
+```{python}
+re.match("a[bc]", "ac")
+```
+
+```{python}
+re.match("a[bc]", "ad")
+```
+
+```{python}
+re.findall("a[bc]", "ab ac ad ae")
+```
+
+We can also specify a range.
+
+```{python}
+re.match("a[0-9]b", "a5b")
+```
+
+```{python}
+re.match("[a-z][0-9][a-z]", "a5b")
+```
+
+We can also negate a character group using `^`.
+
+```{python}
+re.findall("[^a-z0-9]", "10 apples and 20 mangoes!! <>")
+```
 
 ## The Python API
 
