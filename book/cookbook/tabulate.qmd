@@ -1,0 +1,72 @@
+---
+sidebar: cookbook
+execute:
+  enabled: true
+  cache: true
+---
+
+# Printing Tables with Tabulate
+
+The `tabulate` is a python library with a very simple API to format data as tables.
+
+## Importing `tabulate`
+
+Start with importing the `tabulate` funtion from the `tabulate` module.
+
+```{python}
+from tabulate import tabulate
+```
+
+## Usage
+
+We just need to pass the tabular data to tabulate and it takes care of formatting it as a nice table.
+
+```{python}
+from tabulate import tabulate
+
+data =[
+    ["2023-10-18", "1", "83.25"],
+    ["2023-10-17", "1", "83.22"],
+    ["2023-10-16", "1", "83.25"],
+    ["2023-10-13", "1", "83.27"],
+    ["2023-10-12", "1", "83.24"]]
+
+print(tabulate(data))
+```
+
+We can optionally provide headers as well.
+
+```{python}
+from tabulate import tabulate
+
+headers = ["Date", "USD", "INR"]
+data =[
+    ["2023-10-18", "1", "83.25"],
+    ["2023-10-17", "1", "83.22"],
+    ["2023-10-16", "1", "83.25"],
+    ["2023-10-13", "1", "83.27"],
+    ["2023-10-12", "1", "83.24"]]
+
+print(tabulate(data, headers=headers))
+```
+
+It is also possible to provide data a list of dictionaries instead of a list of lists.
+
+
+```{python}
+from tabulate import tabulate
+
+data =[
+    {"Date": "2023-10-18", "USD": "1", "INR": "83.25"},
+    {"Date": "2023-10-17", "USD": "1", "INR": "83.22"},
+    {"Date": "2023-10-16", "USD": "1", "INR": "83.25"},
+    {"Date": "2023-10-13", "USD": "1", "INR": "83.27"},
+    {"Date": "2023-10-12", "USD": "1", "INR": "83.24"}]
+
+print(tabulate(data, headers="keys"))
+```
+
+## References
+
+* [Tabulate Documentation](https://pypi.org/project/tabulate/)
+

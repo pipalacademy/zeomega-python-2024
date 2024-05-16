@@ -1,0 +1,95 @@
+---
+sidebar: cookbook
+execute:
+  enabled: true
+  cache: true
+---
+
+# Working with Dates
+
+Python has a `datetime` module to work with date, time and datetimes. This recipe focuses only on working with dates.
+
+We start with importing the `datetime` module.
+
+```{python}
+import datetime
+```
+
+For all the examples below, please assume that `datetime` is already imported.
+
+## Common Operations
+
+Creating a date:
+
+```{python}
+datetime.date(2020, 10, 20)
+```
+
+Today's date:
+
+```{python}
+datetime.date.today()
+```
+
+Accessing year, month and day.
+
+```{python}
+d = datetime.date(2020, 10, 20)
+print(d.year, d.month, d.day)
+```
+
+Parsing a date:
+
+```{python}
+datetime.date.fromisoformat("2020-02-26")
+```
+
+## Date Arithmatic
+
+The datetime module has `timedelta` to add or subtract dates.
+
+The date of yesterday:
+
+```{python}
+datetime.date.today() - datetime.timedelta(days=1)
+```
+
+10 days from `2020-02-25`:
+
+```{python}
+date = datetime.date(2020, 2, 25)
+for i in range(10):
+    d = date + datetime.timedelta(days=i)
+    print(d)
+```
+
+Or the same thing as a list comprehension:
+
+```{python}
+def date_range(start_date, ndays):
+    return [start_date + datetime.timedelta(days=i) for i in range(ndays)]
+
+date = datetime.date(2020, 2, 25)
+date_range(date, 10)
+```
+
+## Formatting Dates
+
+To format the date in YYYY-MM-DD format, we could just convert the date into string or use `isoformat` method.
+
+```{python}
+d = datetime.date(2020, 2, 25)
+print(d)
+print(str(d))
+print(d.isoformat())
+```
+
+The `strftime` method provides a flexible way to format a date.
+
+```{python}
+d = datetime.date(2020, 2, 25)
+print(d.strftime("%Y-%m-%d"))
+print(d.strftime("%a %b %d, %Y"))
+```
+
+Please refer to [strftime.org](https://strftime.org/) to know the for the availble options.

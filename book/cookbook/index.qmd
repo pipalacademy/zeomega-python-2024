@@ -1,0 +1,16 @@
+---
+sidebar: cookbook
+listing:
+  contents: "*.qmd"
+  type: table
+  id: sample-listings
+  fields:
+    - title
+---
+# Python Cookbook
+
+
+This is a collection of recipies to solve various tasks in Python.
+
+::: {#sample-listings}
+:::
