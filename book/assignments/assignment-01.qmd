@@ -1,0 +1,374 @@
+# Assignment 01
+
+Solutions to Assignment 01.
+
+
+## Mean
+
+Write a function `mean` to compute the arthematic mean of a list of numbers.
+
+The arthemetic mean of `N` numbers is computed by adding all the `N` numbers and dividing the total by `N`.
+
+The function takes the list of numbers as argument and returns the mean.
+
+```python
+>>> mean([1, 2, 3, 4, 5])
+3.0
+```
+
+
+### Solution {.unnumbered}
+
+```python
+def mean(numbers):
+    return sum(numbers)/len(numbers)
+
+```
+
+
+
+
+
+### Discussion {.unnumbered }
+
+The solution is quite straight-forward. We use the built-in function `sum` to compute the total and divide it by the number of numbers, which is computed using the built-in function `len`.
+
+```python
+def mean(numbers):
+    return sum(numbers) / len(numbers)
+```
+
+You could also write that in multiple lines, if you find that more comfortable.
+
+```python
+def mean(numbers):
+    total = sum(numbers)
+    n = len(numbers)
+    return total / n
+```
+
+
+
+
+
+## Product
+
+Write a function `product` to compute the product of a list of numbers.
+
+```
+>>> product([1, 2, 3, 4])
+24
+>>> product([10, 2, 50])
+1000
+```
+
+### Solution {.unnumbered}
+
+```python
+def product(numbers):
+    result = 1
+    for n in numbers:
+        result *= n
+    return result
+```
+
+
+
+
+
+
+## Digit Count
+
+Write a function `digit_count` that takes a number and a digit as argument and returns the number of times the digit is present in that number.
+
+```python
+>>> digit_count(1231, 1)
+2
+>>> digit_count(1231, 3)
+1
+>>> digit_count(1231, 9)
+0
+```
+
+#### Hint
+
+```python
+>>> "mathematics".count("mat")
+2
+```
+
+### Solution {.unnumbered}
+
+```python
+def digit_count(number, digit):
+    return str(number).count(str(digit))
+
+```
+
+
+
+
+
+### Discussion {.unnumbered }
+
+Both the arguments, the `number` and the `digit`, are integers. As shown in the hint, we could use the `count` method, but that works only on strings. So, we need to convert both the `number` and `digit` into strings.
+
+```python
+def digit_count(number, digit):
+    return str(number).count(str(digit))
+```
+
+If that feels complicated to follow, you could simiplify it a bit by splitting that code into multiple lines.
+
+```python
+def digit_count(number, digit):
+    s1 = str(number)
+    s2 = str(digit)
+    return s1.count(s2)
+```
+
+
+
+
+## Despace
+
+Write a function `despace` to remove all the spaces from a string.
+
+```python
+>>> despace("hello world")
+'helloworld'
+>>> despace("a b c d e")
+'abcde'
+>>> despace("pi seconds is a nano century")
+'pisecondsisananocentury'
+```
+
+### Solution {.unnumbered}
+
+```python
+def despace(text):
+    return text.replace(" ", "")
+```
+
+
+
+
+
+
+## Reverse Words
+
+Write a function `reverse_words` that takes a sentence and returns a new sentence with all the words in the reserse order.
+
+```
+>>> reverse_words("joy of programming")
+'programming of joy'
+
+>>> reverse_words("less is more")
+'more is less'
+
+>>> reverse_words("road goes ever on and on")
+'on and on ever goes road'
+```
+
+Please note that only the order of the words in the sentence is reversed, not the letters in each word.
+
+### Solution {.unnumbered}
+
+```python
+
+def reverse_words(sentence):
+    words = sentence.split()
+    return " ".join(words[::-1])
+
+```
+
+
+
+
+
+
+## Upper Case
+
+Write a program uppercase.py that takes a filename as command-line argument and prints all the contents of the file in uppercase.
+
+```
+$ cat files/five.txt
+One
+Two
+Three
+Four
+Five
+
+$ python uppercase.py files/five.txt
+ONE
+TWO
+THREE
+FOUR
+FIVE
+```
+
+### Solution {.unnumbered}
+
+```python
+import sys
+
+path = sys.argv[1]
+contents = open(path).read()
+print(contents.upper())
+```
+
+
+
+
+
+
+## Make Header
+
+Write a program `header.py` that takes a word as command-line argument and prints it as header as shown below with the word converted to upper case.
+
+```
+$ python header.py python
+======
+PYTHON
+======
+
+$ python header.py python-foundation-course
+========================
+PYTHON-FOUNDATION-COURSE
+========================
+```
+
+**Hint:**
+
+```
+>>> name = 'python'
+>>> name.upper()
+'PYTHON'
+```
+
+
+### Solution {.unnumbered}
+
+```python
+import sys
+
+word = sys.argv[1].upper()
+n = len(word)
+print("=" * n)
+print(word)
+print("=" * n)
+```
+
+
+
+
+
+
+## Text in a Box
+
+Write a program `box.py` that takes word as a command-line argument and prints the word in a box as shown below.
+
+```
+$ python box.py python
++--------+
+| python |
++--------+
+```
+
+Please note that there should be exactly one space on either side of the text in the box.
+
+
+### Solution {.unnumbered}
+
+```python
+import sys
+
+word = sys.argv[1]
+
+n = len(word) + 2
+line = "-" * n
+header = f"+{line}+"
+
+print(header)
+print(f"| {word} |")
+print(header)
+```
+
+
+
+
+
+
+## Longest Line
+
+Write a program `longest_line.py` to print the longest line from a file.
+
+The program should take a filename as a command-line argument and print the longest line from it.
+
+```
+$ python longest_line.py files/five.txt
+three
+
+$ python longest_line.py files/zen-of-python.txt
+There should be one-- and preferably only one --obvious way to do it.
+
+$ python longest_line.py files/bumper-stickers.txt
+The first 90 percent of the code accounts for the first 90 percent of the development time. The remaining 10 percent of the code accounts for the other 90 percent of the development time.
+```
+
+### Solution {.unnumbered}
+
+```python
+import sys
+path = sys.argv[1]
+
+lines = open(path).readlines()
+longest = max(lines, key=len)
+print(longest, end="")
+```
+
+
+
+
+
+
+## Line with Most Words
+
+Write a program `line_with_most_words.py` that takes a filename as command-line argument and prints the line with the most number of words from the file.
+
+```
+$ cat files/words.txt
+one
+one two
+one two three
+one two three four
+one two three four five
+two three four five
+three four five
+four five
+five
+one-two-three-four-five-six-seven
+
+$ python line_with_most_words.py files/words.txt
+one two three four five
+```
+
+
+### Solution {.unnumbered}
+
+```python
+import sys
+filename = sys.argv[1]
+lines = open(filename).readlines()
+
+def word_count(line):
+    return len(line.split())
+
+longest = max(lines, key=word_count)
+print(longest.strip("\n"))
+```
+
+
+
+
+

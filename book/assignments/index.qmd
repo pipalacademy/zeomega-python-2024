@@ -1,0 +1,14 @@
+---
+listing:
+  contents: "*.qmd"
+  type: table
+  id: sample-listings
+  fields:
+    - title
+---
+# Assignments
+
+Solutions for the assignments shared during the training.
+
+::: {#sample-listings}
+:::

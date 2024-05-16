@@ -1,0 +1,635 @@
+# Assignment 02
+
+Solutions to Assignment 02.
+
+
+## Sum File
+
+Write a program `sumfile.py` that takes a filename as argument and prints sum of all numbers in the file. It is assumed that the file contains one number per line.
+
+```
+$ python sumfile.py files/ten.txt
+55
+```
+
+
+
+### Solution {.unnumbered}
+
+```python
+import sys
+filename = sys.argv[1]
+numbers = [int(line) for line in open(filename)]
+print(sum(numbers))
+
+```
+
+
+
+
+
+
+## Cumulative Sum
+
+Cumulative sum of a list `[a, b, c, ...]` is defined as `[a, a+b, a+b+c, ...]`.
+
+Write a function `cumulative_sum` to compute the cumulative sum of a list of numbers.
+
+```
+>>> cumulative_sum([1, 2, 3, 4])
+[1, 3, 6, 10]
+>>> cumulative_sum([4, 3, 2, 1])
+[4, 7, 9, 10]
+```
+
+### Solution {.unnumbered}
+
+```python
+
+def cumulative_sum(numbers):
+    result = []
+    csum = 0
+    for n in numbers:
+        csum += n
+        result.append(csum)
+    return result
+```
+
+
+
+
+
+
+## Count Increased
+
+Given a list of numbers, count the number of times a number in the list increases from the previous number.
+
+For example:
+
+Given the list of numbers as `[3, 5, 4, 9, 2, 8]`
+
+
+```
+3 (N/A - no previous number)
+5 (increased)
+4 (decreased)
+9 (increased)
+2 (decreased)
+8 (increased)
+```
+
+So the number of times a number increased from the previous number is 3.
+
+Write a function `count_increased` that takes a list of numbers as arguments and returns the number of times a number in that list is increased from the previous one.
+
+```
+>>> count_increased([3, 5, 4, 9, 2, 8])
+3
+```
+
+Credits: this problem is modelled after [Day 1 problem of Advent of Code 2021][1].
+
+[1]: https://adventofcode.com/2021/day/1
+
+### Solution {.unnumbered}
+
+```python
+def count_increased(numbers):
+    return sum([a > b for a, b in zip(numbers[1:], numbers)])
+```
+
+
+
+
+
+### Discussion {.unnumbered }
+
+Let's consider the example carefully and try to solve it by hand.
+
+```
+3 5 4 9 2 8
+```
+
+How do we find if a number is more than it's previous number?
+
+
+
+We could repeats the numbers in two rows and shift the first one to right by one position and see if each number is increased from the above number.
+
+
+```
+- 3 5 4 9 2 8
+3 5 4 9 2 8 -
+--------------
+  1 0 1 0 1
+```
+
+As you can see there are three cases where a number is increased from its previous number.
+
+A naive approach to do this with code, would be to go over the numbers using index and see if current number is bigger than the one at the previous index.
+
+```python
+def count_increased(numbers):
+    count = 0
+    for i in range(1, len(numbers)):
+        prev = numbers[i-1]
+        current = numbers[i]
+
+        if current > prev:
+            count += 1
+    return count
+```
+
+There are a couple of issues with this approach.
+
+1. Accessing elements using index feels too low-level in Python
+2. Updating the count in the loop is tedius. There must be a better way.
+
+
+Lets see if we can align the numbers in the list with their previous values.
+
+```python
+numbers = [3, 5, 4, 9, 2, 8]
+print(numbers[1:])
+print(numbers)
+```
+<pre class="output">
+[5, 4, 9, 2, 8]
+[3, 5, 4, 9, 2, 8]
+</pre>
+
+As you can see, we have managed to align the numbers with their previous ones.
+
+Now we could use the `zip` function to put the pairs together.
+
+```python
+pairs = zip(numbers[1:], numbers)
+list(pairs)
+```
+<pre class="output">
+[(5, 3), (4, 5), (9, 4), (2, 9), (8, 2)]
+</pre>
+
+```python
+for a, b in zip(numbers[1:], numbers):
+    print(a, b, a > b)
+```
+<pre class="output">
+5 3 True
+4 5 False
+9 4 True
+2 9 False
+8 2 True
+</pre>
+
+As you can see there are three increases.
+
+We could write a list comprehension to get just the True/False values.
+
+```python
+[a > b for a, b in zip(numbers[1:], numbers)]
+```
+<pre class="output">
+[True, False, True, False, True]
+</pre>
+
+In Python, `True` is eqvivalant of 1 and `False` is 0. So we could just sum the result to get the number of `True` values.
+
+```python
+sum([a > b for a, b in zip(numbers[1:], numbers)])
+```
+<pre class="output">
+3
+</pre>
+
+Let's put in a function now.
+
+```python
+def count_increased(numbers):
+    return sum([a > b for a, b in zip(numbers[1:], numbers)])
+```
+
+
+
+
+## Group
+
+Write a function `group` that take a list of values and splits into smaller lists of given size.
+
+```
+>>> group([1, 2, 3, 4, 5, 6, 7, 8, 9], 3)
+[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+>>> group([1, 2, 3, 4, 5, 6, 7, 8, 9], 4)
+[[1, 2, 3, 4], [5, 6, 7, 8], [9]]
+```
+
+### Solution {.unnumbered}
+
+```python
+
+def group(values, n):
+    return [values[i:i+n] for i in range(0, len(values), n)]
+```
+
+
+
+
+
+
+## Paste
+
+Write a program `paste.py` that takes two files as command-line arguments and contacenates the corresponding lines in those two files with a tab character and prints it.
+
+For example, of the first file `files/a.txt` has the following contents:
+
+```
+A
+B
+C
+D
+```
+
+and the second file `files/b.txt` has the following:
+
+```
+1
+2
+3
+4
+```
+
+The output should be:
+
+```
+$ python paste.py files/a.txt files/b.txt
+A       1
+B       2
+C       3
+D       4
+```
+
+Note that the first line is `"A\t1"`.
+
+For simplicity, assume that both the files have exactly same number of lines.
+
+**Hint:**
+
+You can use the `strip` method on a string to remove the new line character.
+
+```
+>>> "a\n".strip("\n")
+"a"
+```
+
+
+### Solution {.unnumbered}
+
+```python
+import sys
+
+f1 = sys.argv[1]
+f2 = sys.argv[2]
+
+for left, right in zip(open(f1), open(f2)):
+    left = left.strip("\n")
+    right = right.strip("\n")
+    print(f"{left}\t{right}")
+```
+
+
+
+
+
+
+## Center Align
+
+Write a program `center_align.py` to center align all lines in the given file.
+
+
+```
+$ cat poem.txt
+There was an Old Man with a beard
+Who said, "It is just as I feared!
+Two Owls and a Hen,
+Four Larks and a Wren,
+Have all built their nests in my beard!"
+
+$ python center_align.py poem.txt
+   There was an Old Man with a beard
+   Who said, "It is just as I feared!
+          Two Owls and a Hen,
+         Four Larks and a Wren,
+Have all built their nests in my beard!"
+```
+
+Hint:
+
+```
+>>> "hello".center(7)
+" hello "
+>>> "hello".center(9)
+"  hello  "
+```
+
+The built-in function `max` can take a list of numbers and return the maximum value out of them.
+
+```
+>>> max([1, 5, 2, 7, 4])
+7
+```
+
+
+### Solution {.unnumbered}
+
+```python
+import sys
+filename = sys.argv[1]
+lines = open(filename).readlines()
+if lines:
+    n = max(len(line.strip()) for line in lines)
+
+    for line in lines:
+        print(line.strip().center(n))
+```
+
+
+
+
+
+
+## Sequence of Numbers
+
+Write a program `seq.py` that takes a number `n` as argument and prints numbers from `1` to `n`. It should support the following two flags.
+
+
+```
+-s START --start START
+    print number from START to n instead of 1 to n
+
+-r --reverse
+    print the numbers in the reverse order
+```
+
+The program should also print approprate help message when used with `-h` or `--help` flags.
+
+Use the standard library module `argparse` for doing this. You may want to checkout the argparse tutorial to know how to use that module.
+
+Expected Output:
+
+```
+$ python seq.py 5
+1
+2
+3
+4
+5
+
+$ python seq.py -s 3 5
+3
+4
+5
+
+$ python seq.py -r -s 3 5
+5
+4
+3
+```
+
+
+### Solution {.unnumbered}
+
+```python
+import argparse
+
+p = argparse.ArgumentParser()
+p.add_argument("n", type=int, help="the last number in the sequence")
+p.add_argument("-s", "--start", type=int, default=1, help="the first number in the sequence (default: 1)")
+p.add_argument("-r", "--reverse", action="store_true", default=False, help="display the numbers in reverse order")
+args = p.parse_args()
+
+numbers = list(range(args.start, args.n+1))
+if args.reverse:
+    numbers = numbers[::-1]
+
+for n in numbers:
+    print(n)
+```
+
+
+
+
+
+
+## command tail
+
+Write a python script `tail.py` which mimics unix command `tail`.
+The command will show last few lines of a file. It takes filename as argument
+and optional argument `-n` to specify how many lines to display. By default it
+displays last 5 lines of the file.
+
+```
+$ python tail.py --help
+usage: tail.py [-h] [-n LINES] filename
+
+positional arguments:
+  filename              path to the file
+
+options:
+  -h, --help            show this help message and exit
+  -n LINES, --lines LINES
+                        Number of lines to display
+
+$ python tail.py files/ten.txt
+6
+7
+8
+9
+10
+
+$ python tail.py -n 3 files/ten.txt
+8
+9
+10
+
+$ python tail.py zen.txt
+Now is better than never.
+Although never is often better than *right* now.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let's do more of those!
+```
+
+### Solution {.unnumbered}
+
+```python
+import argparse
+
+p = argparse.ArgumentParser()
+p.add_argument("filename", help="path to the file")
+p.add_argument("-n", "--lines", type=int, default=5, help="Number of lines to display")
+
+args = p.parse_args()
+n = args.lines
+lines = open(args.filename).readlines()
+lines = lines[-n:]
+for line in lines:
+    print(line, end="")
+
+
+```
+
+
+
+
+
+
+## Grep Command
+
+Implement Unix command grep in Python.
+
+Write a program `grep.py` that takes a pattern and a file as command-line arguments and print all the lines in the file that contain that pattern.
+
+The pattern could be any text and there is no need to support regular expressions.
+
+```
+$ cat files/zen-of-python.txt
+The Zen of Python, by Tim Peters
+
+Beautiful is better than ugly.
+Explicit is better than implicit.
+Simple is better than complex.
+Complex is better than complicated.
+Flat is better than nested.
+Sparse is better than dense.
+Readability counts.
+Special cases aren't special enough to break the rules.
+Although practicality beats purity.
+Errors should never pass silently.
+Unless explicitly silenced.
+In the face of ambiguity, refuse the temptation to guess.
+There should be one-- and preferably only one --obvious way to do it.
+Although that way may not be obvious at first unless you're Dutch.
+Now is better than never.
+Although never is often better than *right* now.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let's do more of those!
+
+$ python grep.py never files/zen-of-python.txt
+Errors should never pass silently.
+Now is better than never.
+Although never is often better than *right* now.
+
+$ grep the files/zen-of-python.txt
+Special cases aren't special enough to break the rules.
+In the face of ambiguity, refuse the temptation to guess.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+```
+
+### Solution {.unnumbered}
+
+```python
+import sys
+
+pat = sys.argv[1]
+filename = sys.argv[2]
+
+for line in open(filename):
+    if pat in line:
+        print(line, end="")
+```
+
+
+
+
+
+
+## Split a File
+
+Write a program `split.py` that splits a large file into multiple smaller files. The program should take a filename and the number of lines as arguments and write multiple small files each containing the specified number of lines (The last one may have smaller number of lines).
+
+Suppose you have a file `100.txt` in the current directory. (you can copy it from files/100.txt).
+
+```
+$ cp files/100.txt 100.txt
+```
+
+When you run split.py with that, it should split that into multiple small files.
+
+```
+$ python split.py 100.txt 30
+writing 100-part1.txt
+writing 100-part2.txt
+writing 100-part3.txt
+writing 100-part4.txt
+```
+
+### Solution {.unnumbered}
+
+```python
+"""Program to split a file into smaller parts.
+
+It takes a filename and the number of lines in each part as
+command-line arguments and splits the file into smaller parts
+with each file having no more than the specified number of lines.
+
+USAGE:
+    $ python split.py large-file.txt 100
+    writing large-file-part1.txt
+    writing large-file-part2.txt
+    ...
+"""
+import sys
+
+def group(values, n):
+    return [values[i:i+n] for i in range(0, len(values), n)]
+
+def splitfile(filename, chunk_size):
+    lines = open(filename).readlines()
+    return group(lines, chunk_size)
+
+def write_lines(filename, lines):
+    """Write a list of lines to the a file.
+    """
+    print("writing", filename)
+    with open(filename, "w") as f:
+        f.writelines(lines)
+
+def generate_part_filename(filename, index):
+    """Generates a new filename by adding index as suffix to the filename.
+
+        >>> generate_part_filename("a.txt", 1)
+        "a-part1.txt"
+    """
+    nameparts = filename.split(".", 1)
+    if len(nameparts) == 2:
+        name, ext = nameparts
+        ext = "." + ext
+    else:
+        name = filename
+        ext = ""
+
+    return f"{name}-part{index}{ext}"
+
+def write_small_files(filename, file_chunks):
+    for i, chunk in enumerate(file_chunks, start=1):
+        new_filename = generate_part_filename(filename, i)
+        write_lines(new_filename, chunk)
+
+def main():
+    filename = sys.argv[1]
+    chunk_size = int(sys.argv[2])
+    file_chunks = splitfile(filename, chunk_size)
+    write_small_files(filename, file_chunks)
+
+if __name__ == "__main__":
+    main()
+
+```
+
+
+
+
+

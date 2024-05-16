@@ -20,6 +20,11 @@ book:
       chapters:
         - cookbook/dates.qmd
         - cookbook/tabulate.qmd
+    - part: Assignments
+      href: assignments/index.qmd
+      chapters:
+        - assignments/assignment-01.qmd
+        - assignments/assignment-02.qmd
     - part: Live Notes
       href: live-notes/index.qmd
       chapters:
