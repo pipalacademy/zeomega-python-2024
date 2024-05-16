@@ -2,3 +2,6 @@ markdown
 Pandas
 nbconvert
 cookiecutter
+pytest
+SQLAlchemy
+tabulate
