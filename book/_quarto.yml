@@ -21,6 +21,7 @@ book:
         - live-notes/day1.ipynb
         - live-notes/day2.ipynb
         - live-notes/day3.ipynb
+        - live-notes/day4.ipynb
 
 bibliography: references.bib
 
