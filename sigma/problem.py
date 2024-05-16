@@ -1,6 +1,7 @@
 import yaml
 import nbformat as nbf
 from pathlib import Path
+import markdown
 from . import config
 
 
@@ -38,6 +39,16 @@ class Problem:
     def get_description_html(self):
         desc = self.get_description()
         return self.markdown(desc)
+
+
+    def get_solution(self):
+        solution_file = self.metadata['files']['solution'][0]
+        path = self.root / solution_file
+        return path.read_text()
+
+    def get_discussion(self):
+        path = self.root / "solution" / "discussion.md"
+        return path.read_text() if path.exists() else ""
 
     def markdown(self, text):
         return markdown.markdown(text, extensions=['fenced_code'])
