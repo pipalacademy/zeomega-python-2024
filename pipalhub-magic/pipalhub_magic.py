@@ -5,7 +5,7 @@ Jupyter Lab magic commands for trainings by Pipal Academy.
 """
 from IPython import get_ipython
 from IPython.display import display
-from IPython.core.magic import Magics, magics_class, line_magic, needs_local_scope
+from IPython.core.magic import Magics, magics_class, line_magic, cell_magic, needs_local_scope
 
 import ipykernel
 from jupyter_server import serverapp as app
@@ -372,6 +372,36 @@ class PipalMagics(Magics):
     def verify_problem(self, name, local_ns=None):
         problem = Problem.find(name)
         problem.verify(local_ns)
+
+    @cell_magic
+    def query(self, line, cell=None):
+        self._query(q=cell, db="trains.db")
+
+    @cell_magic
+    def sqlite(self, line, cell=None):
+        self._query(q=cell, db=line.strip() or ":memory:")
+
+    def _query(self, db, q):
+        import pandas as pd
+        import sqlite3
+
+        with sqlite3.connect(db) as conn:
+            cur = conn.cursor()
+            cur.execute(q)
+            columns = [c[0] for c in cur.description]
+            data = cur.fetchall()
+            df = pd.DataFrame(data, columns=columns)
+
+            # start row index from 1 instead of 0
+            df.index += 1
+
+            pd.set_option('display.max_rows', None)
+            pd.set_option('display.max_columns', None)
+            try:
+                display(df)
+            finally:
+                pd.reset_option('display.max_rows')
+                pd.reset_option('display.max_columns')
 
 ipython = get_ipython()
 ipython.register_magics(PipalMagics)
