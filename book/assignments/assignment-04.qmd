@@ -1,0 +1,696 @@
+# Assignment 04
+
+Solutions to Assignment 04.
+
+
+## Reverse Digits
+
+Write a function `reverse_digits` which will reverse digits of multi digit number and return new formed integer.
+
+```
+>>> reverse_digits(1234)
+4321
+```
+
+
+### Solution {.unnumbered}
+
+```python
+
+def reverse_digits(num):
+    return int(str(num)[::-1])
+
+```
+
+
+
+
+
+
+## Invert Dict
+
+Write a function `invertdict` to interchange the keys and values in a dictionary.
+
+The function should take a dictionary as an argument and return a new dictionary with keys and values interchanged. For simplicity, assume that the values in the dictionary are unique.
+
+```
+>>> invertdict({"x": 1, "y": 2, "z": 3})
+{1: "x", 2: "y", 3: "z"}
+```
+
+### Solution {.unnumbered}
+
+```python
+
+```
+
+
+
+
+
+
+## Sort Words
+
+Write a function `sort_words` to rearrange the words in a sentense in the sorted or order.
+
+```python
+>>> sort_words("one two three four five")
+'five four one three two'
+>>> sort_words("white cat and black dog")
+'and black cat dog white'
+>>> sort_words("have a nice day")
+'a day have nice'
+```
+
+### Solution {.unnumbered}
+
+```python
+def sort_words(sentence):
+    words = sentence.split()
+    return " ".join(sorted(words))
+```
+
+
+
+
+
+
+## Barchart
+
+Write a function barchart that takes a list of numbers and prints them as a barchart.
+
+```
+>>> barchart([2, 5, 4, 3])
+|==
+|=====
+|====
+|===
+```
+
+
+### Solution {.unnumbered}
+
+```python
+def barchart(numbers):
+    for n in numbers:
+        print("|" + "=" * n)
+```
+
+
+
+
+
+
+## LS Long Format
+
+Implement the `ls -l` command in Python.
+
+The `ls -l` command in unix provides a lot of information about the files in a directory. Write a python program `ls.py` that provide an equivalant output.
+
+The program should take path to a directory as command-line argument and print all the files in that directory in long format.
+
+Please note that the program should ignore all the hidden files, the ones with filename starting with a dot (`.`).
+
+```
+$ python ls.py files/images
+-rw-r--r--  1  jupyter-anand  jupyter-anand      409  Feb 24 03:57  README.md
+-rw-r--r--  1  jupyter-anand  jupyter-anand  2084269  Feb 24 02:57  bangalore-1.jpg
+-rw-r--r--  1  jupyter-anand  jupyter-anand  1276973  Jan 17 06:39  bangalore-2.jpg
+-rw-r--r--  1  jupyter-anand  jupyter-anand   785897  Jan 26 11:20  bangalore-3.jpg
+-rw-r--r--  1  jupyter-anand  jupyter-anand  1898997  Feb 14 04:39  bangalore-4.jpg
+
+$ python ls.py files/numbers
+-rw-r--r--  1  jupyter-anand  jupyter-anand      21  Sep 27 17:44  10.txt
+-rw-r--r--  1  jupyter-anand  jupyter-anand     292  Sep 27 17:44  100.txt
+-rw-r--r--  1  jupyter-anand  jupyter-anand    3893  Sep 27 17:44  1000.txt
+-rw-r--r--  1  jupyter-anand  jupyter-anand  588895  Sep 27 17:44  100k.txt
+-rw-r--r--  1  jupyter-anand  jupyter-anand   48894  Sep 27 17:44  10k.txt
+```
+
+
+### The Output
+
+The output contains the following fields:
+
+- mode - the mode of the file
+- nlinks - number of links to the file
+- owner - owner of the file
+- group - group of the file
+- size - size of the file
+- mtime - last modified time of the file
+- filename - the filename
+
+It is expected that the output for mtime is formatted as _Month Day Hour:Minute_. For example _Feb 24 02:57_.
+
+### Hints
+
+**mode, nlinks & size**
+
+The mode can be found from the stat result.
+
+```python
+>>> st = Path("files/images/bangalore-1.jpg").stat()
+>>> st.st_mode
+33188
+>>> import stat
+>>> stat.filemode(st.st_mode)
+'-rw-r--r--'
+```
+
+The number of links is avalable from the field `st_nlink`.
+
+```python
+>>> st.st_nlink
+1
+```
+
+The file size is available from the field `st_size`.
+
+```python
+>>> st.st_size
+2084269
+```
+
+The last modified time is available from the field `st_mtime`, but we need to format it.
+
+```python
+>>> st.st_mtime
+1677207454.0
+```
+
+We need to convert it into time struct.
+
+```python
+>>> import time
+>>> time.localtime(st.st_mtime)
+time.struct_time(tm_year=2023, tm_mon=2, tm_mday=24, tm_hour=2, tm_min=57, tm_sec=34, tm_wday=4, tm_yday=55, tm_isdst=0)
+```
+
+And we need to format this. See https://strftime.org/ for details about formatting options.
+
+```python
+>>> t = time.localtime(st.st_mtime)
+>>> time.strftime("%b %d %H:%M", t)
+'Feb 24 02:57'
+```
+
+**owner and group**
+
+```python
+>>> path = Path("files/images/bangalore-1.jpg")
+>>> path.owner()
+'jupyter-anand'
+>>> path.group()
+'jupyter-anand'
+```
+
+You can use tabulate with `tablefmt='plain'`.
+
+```python
+>>> from tabulate import tabulate
+>>> data = [["Alice", 10], ["Bob", 256]]
+>>> print(tabulate(data))
+-----  ---
+Alice   10
+Bob    256
+-----  ---
+>>> print(tabulate(data, tablefmt="plain"))
+Alice   10
+Bob    256
+```
+
+
+### Solution {.unnumbered}
+
+```python
+%%file ls.py
+import sys
+from pathlib import Path
+from tabulate import tabulate
+import stat
+import time
+
+def process_file(path):
+    st = path.stat()
+    t = time.localtime(st.st_mtime)
+    ts = time.strftime("%b %d %H:%M", t)
+    return [stat.filemode(st.st_mode),
+            st.st_nlink,
+            path.owner(),
+            Path.group(),
+            st.st_size,
+            ts,
+            path.name]
+
+path = Path(sys.argv[1])
+data = [process_file(p) for p in path.iterdir()]
+print(tabulate(data, tablefmt="plain"))
+```
+
+
+
+
+
+
+## Unzip
+
+Write a program `unzip.py` to extract and list files in a zip archive.
+
+The program is expected to work similar to the `unzip` command in unix, with a limited functionality as described below.
+
+The program supports extracting and listing files in a zip archive.
+
+It should take a zip file as an argument and extract all the files in the archive to the current directory. If optional argument `-d` is specified, the files should be extracted to the specified directory instead of current directory.
+
+If the optional argument `-l` is specified, the program should list the contents of the archive in the format shown in the examples below.
+
+
+
+```
+$ python unzip.py files/images.zip
+
+$ tree images
+images
+├── bangalore-1.jpg
+├── bangalore-2.jpg
+├── bangalore-3.jpg
+├── bangalore-4.jpg
+└── README.md
+
+$ python unzip.py files/images.zip -d pics
+
+$ tree pics
+pics
+└── images
+    ├── bangalore-1.jpg
+    ├── bangalore-2.jpg
+    ├── bangalore-3.jpg
+    ├── bangalore-4.jpg
+    └── README.md
+
+$ python unzip -l files/images.zip
+  Length  Date        Time      Filename
+--------  ----------  --------  ----------------------
+ 2084269  2023-02-24  02:57:34  images/bangalore-1.jpg
+ 1276973  2023-01-17  06:39:08  images/bangalore-2.jpg
+  785897  2023-01-26  11:20:58  images/bangalore-3.jpg
+ 1898997  2023-02-14  04:39:12  images/bangalore-4.jpg
+     409  2023-02-24  03:57:50  images/README.md
+```
+
+### Hints
+
+* Use [zipfile](https://docs.python.org/3/library/zipfile.html) module
+    * See [ZipFile.extractall()](https://docs.python.org/3/library/zipfile.html#zipfile.ZipFile.extractall)
+    * See [ZipFile.infolist()](https://docs.python.org/3/library/zipfile.html#zipfile.ZipFile.infolist)
+* Use `tabulate` module to print the listing
+
+### Solution {.unnumbered}
+
+```python
+%%file unzip.py
+from zipfile import ZipFile
+import argparse
+from tabulate import tabulate
+
+p = argparse.ArgumentParser()
+p.add_argument("zipfile", help="Zip file to work with")
+p.add_argument("-l", "--list", default=False, action="store_true",
+               help="List files in the zip file")
+p.add_argument("-d", "--destination", default=".",
+               help="Path to extract")
+
+def list_files(zip):
+    data = []
+    headers = ["Length", "Date", "Time", "Filename"]
+    for z in zip.infolist():
+        size = z.file_size
+        y, m, d, hours, minutes, seconds = z.date_time
+        date = f"{y:04d}-{m:02d}-{d:02d}"
+        time = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        entry = [size, date, time, z.filename]
+        data.append(entry)
+
+    print(tabulate(data, headers=headers))
+
+def unzip(zip, path):
+    zip.extractall(path)
+
+args = p.parse_args()
+zip = ZipFile(args.zipfile)
+
+if args.list:
+    list_files(zip)
+else:
+    unzip(zip, args.destination)
+```
+
+
+
+
+
+
+## Hosts Writer
+
+Write a module `hosts` with two functions `tostring` and `write` to serialize a dictionary with hosts to IP address mapping.
+
+The `tostring` function takes a dictionary with host to ip mapping to a string in /etc/hosts file format.
+
+The `write` function takes a filename and a dictionary as arguments and writes the dictionary in /etc/hosts file format to the specified file.
+
+```
+>>> import hosts
+>>> data = {"web": "1.2.3.4", "db": "1.2.3.5"}
+>>> print(hosts.tostring(data))
+1.2.3.4 web
+1.2.3.5 db
+
+>>> data = {"web1": "1.2.3.4", "web2": "1.2.3.4", "db": "1.2.3.5"}
+>>> print(hosts.tostring(data))
+1.2.3.4 web1 web2
+1.2.3.5 db
+
+>>> hosts.write("hosts.txt", data)
+>>> print(open("hosts.txt").read())
+1.2.3.4 web1 web2
+1.2.3.5 db
+```
+
+Also write a `test_hosts.py` with test cases to verify if your solution is correct.
+
+
+### Solution {.unnumbered}
+
+```python
+# hosts.py
+
+def tostring(hosts):
+    ips = {}
+    for host, ip in hosts:
+        ips.setdefault(ip, []).append(host)
+
+    lines = [" ".join([ip] + names) for ip, names in ips.items()]
+    return "\n".join(lines)
+
+def write(filename, hosts):
+    with open(filename, "w") as f:
+        f.write(tostring(hosts))
+```
+
+
+
+
+
+
+## Wget
+
+Write a program wget.py that takes a URL as command-line argument and downloads that to current directory.
+
+
+```
+$ python wget.py https://anandology.com/tmp/hello.txt
+Downloaded to hello.txt
+
+$ python wget.py https://anandology.com/tmp/python.png
+Downloaded to python.png
+```
+
+Please note that the filename to save the URL is identified from the URL.
+
+
+
+### Solution {.unnumbered}
+
+```python
+import requests
+import sys
+
+url = sys.argv[1]
+response = requests.get(url)
+
+filename = url.split("/")[-1]
+
+# The contents of URL could be binary.
+# Using response.content to get the contents as bytes and writing in binary mode
+with open(filename, "wb") as f:
+    f.write(response.content)
+
+print("Downloaded to", filename)
+```
+
+
+
+
+
+
+## Disk Usage
+
+Get the disk usage of the computer using the df command.
+
+The unix command `df` prints the disk usage of every mounted filesystem on the computer.
+
+```
+$ df
+Filesystem     1K-blocks    Used Available Use% Mounted on
+overlay         81106868 7855408  73235076  10% /
+tmpfs              65536       0     65536   0% /dev
+shm                65536       0     65536   0% /dev/shm
+/dev/vda1       81106868 7855408  73235076  10% /home
+tmpfs            2009932       0   2009932   0% /proc/acpi
+tmpfs            2009932       0   2009932   0% /proc/scsi
+tmpfs            2009932       0   2009932   0% /sys/firmware
+```
+
+Write a function `df` that invokes the command `df`, parses the output and returns the output as python values.
+
+```
+>>> df()
+[
+    {'filesystem': 'overlay', 'blocks': 81106868, 'used': 7855576, 'available': 73234908, 'percent_used': 10, 'path': '/'},
+    {'filesystem': 'tmpfs', 'blocks': 65536, 'used': 0, 'available': 65536, 'percent_used': 0, 'path': '/dev'},
+    {'filesystem': 'shm', 'blocks': 65536, 'used': 0, 'available': 65536, 'percent_used': 0, 'path': '/dev/shm'},
+    {'filesystem': '/dev/vda1', 'blocks': 81106868, 'used': 7855576, 'available': 73234908, 'percent_used': 10, 'path': '/home'},
+    {'filesystem': 'tmpfs', 'blocks': 2009932, 'used': 0, 'available': 2009932, 'percent_used': 0, 'path': '/proc/acpi'},
+    {'filesystem': 'tmpfs', 'blocks': 2009932, 'used': 0, 'available': 2009932, 'percent_used': 0, 'path': '/proc/scsi'},
+    {'filesystem': 'tmpfs', 'blocks': 2009932, 'used': 0, 'available': 2009932, 'percent_used': 0, 'path': '/sys/firmware'}
+]
+```
+
+Please note that the values of `blocks`, `used`, `available` and `percent_used` are integers.
+
+Hints:
+
+You can use the `os.popen` command to run and command and read its output as a file.
+
+```
+>>> os.popen("seq 3").readlines()
+['1\n', '2\n', '3\n']
+```
+
+In the above example, we are executing the command `seq 3` and reading the output in Python.
+
+
+### Solution {.unnumbered}
+
+```python
+import os
+
+
+def parse_line(line):
+    fs, blocks, used, available, percent, path = line.strip().split()
+    return {
+        "filesystem": fs,
+        "blocks": int(blocks),
+        "used": int(used),
+        "available": int(available),
+        "percent_used": int(percent.strip("%")),
+        "path": path
+    }
+
+def df():
+    lines = os.popen("df").readlines()
+    return [parse_line(line) for line in lines[1:]]
+
+```
+
+
+
+
+
+
+## The dig tool
+
+The `dig` command is a popular tool for querying DNS name servers. You task is to expose the _dig_ command in Python as a function `dig`.
+
+### The `dig` command
+
+Let's look at the output of the dig command to understand how it works.
+
+```
+$ dig amazon.com
+
+; <<>> DiG 9.18.1-1ubuntu1.2-Ubuntu <<>> amazon.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 49697
+;; flags: qr rd ra; QUERY: 1, ANSWER: 3, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 65494
+;; QUESTION SECTION:
+;amazon.com.			IN	A
+
+;; ANSWER SECTION:
+amazon.com.		128	IN	A	205.251.242.103
+amazon.com.		128	IN	A	54.239.28.85
+amazon.com.		128	IN	A	52.94.236.248
+
+;; Query time: 16 msec
+;; SERVER: 127.0.0.53#53(127.0.0.53) (UDP)
+;; WHEN: Wed Jan 18 13:45:30 IST 2023
+;; MSG SIZE  rcvd: 87
+```
+
+The output is too verbose. We can silence everything else and show only answer using:
+
+```
+$ dig +noall +answer amazon.com
+amazon.com.		128	IN	A	205.251.242.103
+amazon.com.		128	IN	A	54.239.28.85
+amazon.com.		128	IN	A	52.94.236.248
+```
+
+We used the `dig` command to query the name server to look up for amazon.com. By default, it queries for records of type `A`, which stands for _IPv4 Address_.
+
+The DNS server responded with three records matching the domain name `amazon.com`. Each entry contains 5 fields, namely the domain name, TTL, class, record type and content.
+
+See [how to read dig output on wizard zines][1] for more details.
+
+[1]: https://wizardzines.com/comics/dig-output/
+
+## Advanced Usage
+
+**Record Type**
+
+We can optionally pass the _record type_ to `dig` to query of other types of DNS records like MX (mail exchange), TXT (text notes), NS (name server) etc.
+
+The following command, queries for records of type MX.
+
+```
+$ dig +noall +answer amazon.com mx
+amazon.com.		766	IN	MX	5 amazon-smtp.amazon.com.
+```
+
+In case of MX records, the content contains the priority and the mail server name. There could be more than one entry.
+
+The following command queries for records of type NS.
+
+```
+$ dig +noall +answer amazon.com ns
+amazon.com.		1626	IN	NS	pdns6.ultradns.co.uk.
+amazon.com.		1626	IN	NS	ns3.p31.dynect.net.
+amazon.com.		1626	IN	NS	ns4.p31.dynect.net.
+amazon.com.		1626	IN	NS	ns1.p31.dynect.net.
+amazon.com.		1626	IN	NS	ns2.p31.dynect.net.
+amazon.com.		1626	IN	NS	pdns1.ultradns.net.
+```
+
+**Server**
+
+By default, the _dig_ command queries the DNS server configured in the system. However, we can explicitly pass a server to query it.
+
+```
+$ dig +noall +answer amazon.com @8.8.8.8
+amazon.com.		128	IN	A	205.251.242.103
+amazon.com.		128	IN	A	54.239.28.85
+amazon.com.		128	IN	A	52.94.236.248
+```
+
+The `8.8.8.8` is the Google DNS server. The output would look exactly the same in the normal times, but it is very handy to troubleshoot DNS issues with your domain by querying various known DNS server.
+
+There are some hobby DNS servers like [dns.toys](https://dns.toys) that provide useful utilities over dns.
+
+```
+$ dig +noall +answer mumbai.weather @dns.toys
+mumbai.			1	IN	TXT	"Mumbai (IN)" "30.40C (86.72F)" "32.10% hu." "clearsky_day" "14:30, Wed"
+mumbai.			1	IN	TXT	"Mumbai (IN)" "27.90C (82.22F)" "42.80% hu." "clearsky_day" "16:30, Wed"
+mumbai.			1	IN	TXT	"Mumbai (IN)" "23.00C (73.40F)" "71.40% hu." "clearsky_night" "18:30, Wed"
+mumbai.			1	IN	TXT	"Mumbai (IN)" "20.40C (68.72F)" "90.50% hu." "clearsky_night" "20:30, Wed"
+mumbai.			1	IN	TXT	"Mumbai (IN)" "18.80C (65.84F)" "90.40% hu." "clearsky_night" "22:30, Wed"
+```
+
+## Summary of Usage
+
+The _dig_ command is used as follows:
+
+```
+dig options domain-name record-type @server
+```
+
+The _options_, _record-type_ and _server_ are optional.
+
+
+## The Python API
+
+You task is to implement a Python function `dig` that calls the _dig_ command with appropriate arguments, parse the output and returns the result as a Python data structure.
+
+The funtion takes the doman name as argument and two optional arguments, `record_type` and `server`.
+
+Sample Usage:
+
+```python
+>>> dig("amazon.com")
+[
+    {"name": "amazon.com.", "ttl": 128, "class": "IN", "record_type": "A", "content": "205.251.242.103"},
+    {"name": "amazon.com.", "ttl": 128, "class": "IN", "record_type": "A", "content": "54.239.28.85"},
+    {"name": "amazon.com.", "ttl": 128, "class": "IN", "record_type": "A", "content": "52.94.236.248"}
+]
+
+>>> dig("amazon.com", record_type="MX")
+[
+  {"name": "amazon.com", "ttl": 498, "class": "IN", "record_type": "MX", "content": "5 amazon-smtp.amazon.com."}
+]
+
+>>> dig("amazon.com", record_type="MX", server="8.8.8.8")
+[
+  {"name": "amazon.com", "ttl": 498, "class": "IN", "record_type": "MX", "content": "5 amazon-smtp.amazon.com."}
+]
+
+>>> dig("mumbai.weather", server="dns.toys")
+[
+    {"name": "mumbai.", "ttl": 1, "class": "IN", "record_type": "TXT", "content": '"Mumbai (IN)" "30.40C (86.72F)" "32.10% hu." "clearsky_day" "14:30, Wed"'},
+    ...
+]
+```
+
+
+### Solution {.unnumbered}
+
+```python
+import subprocess
+
+def parse_record(line):
+    name, ttl, klass, record_type, content = line.strip().split(None, 4)
+    return {
+        "name": name,
+        "ttl": int(ttl),
+        "record_type": record_type,
+        "class": klass,
+        "content": content
+    }
+
+def dig(name, record_type="A", server=None):
+    """Python interface to the dig command.
+    """
+    cmd = ["dig", '+noall', '+answer', name, record_type]
+    if server:
+        cmd.append(f"@{server}")
+    print(cmd)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
+    return [parse_record(line) for line in p.stdout]
+```
+
+
+
+
+

@@ -1,0 +1,672 @@
+# Assignment 03
+
+Solutions to Assignment 03.
+
+
+## Generate Password
+
+Write a function `generate_password` to generate random password of given length.
+
+The function should take length `n` as argument and generate a password using mix of letters from lowercase, uppercase from English alphabet and digits. It should not have any other characters.
+
+```
+>>> generate_password(8)
+'rBZLcP8V'
+>>> generate_password(25)
+'JU938tUT36QRvVEPh9OLrxlrB'
+```
+
+**Hint**
+
+* See `random.choice` function from the `random` module
+* See `string.ascii_letters` and `string.digits` from the string module
+
+### Solution {.unnumbered}
+
+```python
+import string
+import random
+
+def generate_password(n):
+    text = string.ascii_letters + string.digits
+    return "".join([random.choice(text) for i in range(n)])
+
+```
+
+
+
+
+
+
+## Flatten the list
+
+Write a function `flatten` which combines nested lists into a single list. It takes a list of lists as an argument and returns a list of all elements from nested lists.
+
+```
+>>> flatten([[1,2,3],[4,5],[6,7,8,9]])
+[1,2,3,4,5,6,7,8,9]
+```
+
+
+### Solution {.unnumbered}
+
+```python
+def flatten(items):
+    return sum(items, start=[])
+
+```
+
+
+
+
+
+
+## Count File Extensions
+
+Write a program `extcount.py` to count the number of files per extension. The program should take path to a directory as argument and print the count and extension for each available extension, sorted by the count. Files without any extension should be ignored.
+
+```
+$ python extcount.py files/extcount
+4 py
+3 txt
+2 csv
+1 yml
+
+$ python extcount.py files/extcount/data
+4 txt
+2 csv
+```
+
+
+### Solution {.unnumbered}
+
+```python
+import sys
+import os
+from collections import Counter
+
+path = sys.argv[1]
+filenames = os.listdir(path)
+extensions = [f.split(".")[-1] for f in filenames if "." in f]
+
+for ext, count in Counter(extensions).most_common():
+    print(count, ext)
+```
+
+
+
+
+
+
+## Sort Command
+
+Write a program `sort.py` that takes filename as a command-line argument and prints lines in that file in the sorted order.
+
+This program should support the following flags.
+
+```
+-i --ignore-case    ignore the case while sorting
+-n --numeric-sort   compare according to string numerical value
+-r --reverse        print the results in the reverse order
+```
+
+```
+$ python sort.py files/sort/names.txt
+alice
+bob
+charlie
+dave
+
+$ python sort.py -r files/sort/names.txt
+dave
+charlie
+bob
+alice
+
+$ python sort.py files/sort/names-with-case.txt
+Alice
+Dave
+bob
+charlie
+
+$ python sort.py -i files/sort/names-with-case.txt
+Alice
+Dave
+bob
+charlie
+
+$ python sort.py files/sort/numbers.txt
+1
+10
+100
+1000
+2
+20
+200
+2000
+
+$ python sort.py -n files/sort/numbers.txt
+1
+2
+10
+20
+100
+200
+1000
+2000
+
+$ python sort.py -nr files/sort/numbers.txt
+2000
+1000
+200
+100
+20
+10
+2
+1
+```
+
+Hint: use `argparse`
+
+### Solution {.unnumbered}
+
+```python
+import argparse
+
+p = argparse.ArgumentParser()
+p.add_argument("-i", "--ignore-case", action="store_true", default=False, help="ignore case")
+p.add_argument("-n", "--numeric-sort", action="store_true", default=False, help="numeric sort")
+p.add_argument("-r", "--reverse", action="store_true", default=False, help="reverse order")
+p.add_argument("filename")
+args = p.parse_args()
+
+def get_key(args):
+    if args.numeric_sort:
+        return int
+    elif args.ignore_case:
+        return str.lower
+    else:
+        return None
+
+key = get_key(args)
+reverse = args.reverse
+lines = sorted(open(args.filename), key=key, reverse=reverse)
+for line in lines:
+    print(line, end="")
+```
+
+
+
+
+
+
+## Make Slug
+
+Write a function make_slug that takes title as argument and converts that into a nice name that can be used as part of URL. Make sure the the slug is in lower case.
+
+The function should replace the occurances all non-alpha-numeric characters into a hyphen (-). When there multiple such characters together, they should get converted to a single hypen. Also, there should not be any hypens at the beginning or the end of the slug.
+
+```python
+>>> make_slug("Advanced python")
+'advanced-python'
+>>> make_slug("Hello, World!")
+'hello-world'
+>>> make_slug("1 + 2 = 3 !")
+'1-2-3'
+>>> make_slug("https://google.com/")
+'https-google-com'
+```
+
+### Solution {.unnumbered}
+
+```python
+
+```
+
+
+
+
+
+
+## Find Duplicates
+
+Write a function `dups` that takes a list of values as argument and finds all the elements that appear more than once in the list.
+
+```
+>>> dups([1, 2, 1, 3, 2, 5])
+[1, 2]
+>>> dups([1, 2, 3, 4, 5])
+[]
+>>> dups([1, 1, 1, 1])
+[1]
+```
+
+### Solution {.unnumbered}
+
+```python
+def dups(numbers):
+    seen = []
+    result = []
+    for n in numbers:
+        if n in seen and n not in result:
+            result.append(n)
+        seen.append(n)
+    return result
+```
+
+
+
+
+
+
+## Run-length Decoding
+
+Run-length encoding (RLE) is a form of lossless data compression which represents the many consequetive occurances of the same values with its length and the value. It was used in early graphics file formats for compressing black and white images.
+
+If we present the black and white values for pixels as `W` and `B`, the sequence of `WWWBBW` can be runtime encoded as `3W2B1W`.
+
+Similarly, the data `12W1B12W` would be decoded as a sequence of twelve Ws, one B and twelve Ws.
+
+Write functions `encode` and `decode` to encode a run-length encoded image and decode it back.
+
+```
+>>> encode('WWWBBW')
+'3W2B1W'
+>>> encode(''WWWWWWWWWWWWBWWWWWWWWWWWW')
+'12W1B12W'
+
+>>> decode('3W2B1W')
+'WWWBBW'
+>>> decode('12W1B12W')
+'WWWWWWWWWWWWBWWWWWWWWWWWW'
+```
+
+Assume that the data is the correct format.
+
+#### Hints
+
+You may be able to use regular expressions. See `re.findall`.
+
+#### References
+
+* [https://en.wikipedia.org/wiki/Run-length_encoding](https://en.wikipedia.org/wiki/Run-length_encoding)
+
+
+### Solution {.unnumbered}
+
+```python
+import re
+
+def decode(data):
+    pairs = re.findall("(\d+)([BW]+)", data)
+    return "".join([c* int(count) for count, c in pairs])
+
+def encode(image):
+    chunks = re.findall("(W+|B+)", image)
+    return "".join(f"{len(x)}{x[0]}" for x in chunks)
+
+```
+
+
+
+
+
+
+## Nominatim OSM Search
+
+Write a program `nominatim.py` to search for a place in Open Street Map using [Nominatim API][1].
+
+[1]: https://nominatim.org/release-docs/develop/api/Search/
+
+## The API
+
+```
+$ curl 'https://nominatim.openstreetmap.org/search.php?q=bangalore&format=jsonv2'
+[
+  {
+    "place_id": 216751017,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "relation",
+    "osm_id": 7902476,
+    "lat": "12.9767936",
+    "lon": "77.590082",
+    "category": "boundary",
+    "type": "administrative",
+    "place_rank": 16,
+    "importance": 0.6094348238975636,
+    "addresstype": "city",
+    "name": "Bengaluru",
+    "display_name": "Bengaluru, Bangalore North, Bengaluru Urban District, Karnataka, India",
+    "boundingbox": [
+      "12.8340125",
+      "13.1436649",
+      "77.4601025",
+      "77.7840515"
+    ]
+  }
+]
+```
+
+The Nominatum API returns the information about the matched locations. There could be zero, one, or more matches.
+
+## The Program
+
+The program is expected to take the place name as a command-line argument and print the `display_name`, `type`, `lat` and `lon` for every match from the nominatum search for that place, as shown in the examples below.
+
+```
+$ python nominatum.py Bangalore
+Bengaluru, Bangalore North, Bengaluru Urban District, Karnataka, India
+Type: administrative
+Latitude: 12.9767936
+Longitude: 77.590082
+
+```
+
+When there are multiple matches, they are separated by a new line.
+
+```
+$ python nominatum.py "silk board"
+Silk Board, Outer Ring Road, BTM 2nd Stage, BTM Layout Ward, South Zone, Bengaluru, Bangalore South, Bengaluru Urban District, Karnataka, 560034, India
+Type: bus_stop
+Latitude: 12.9170295
+Longitude: 77.6223209
+
+Silk Board, Srinagar - Kanyakumari Highway, HSR Layout Ward, Bommanahalli Zone, Bengaluru, Bangalore South, Bengaluru Urban District, Karnataka, 560034, India
+Type: bus_stop
+Latitude: 12.9167972
+Longitude: 77.6235628
+
+```
+
+Sometimes there could be a lot of matches.
+
+```
+$ python nominatum.py Google
+Google, 355, Main Street, East Cambridge, Cambridge, Middlesex County, Massachusetts, 02142, United States
+Type: company
+Latitude: 42.3627717
+Longitude: -71.087257
+
+Google, West Bluff Creek Drive, Playa Vista, Los Angeles, Los Angeles County, California, 90094, United States
+Type: company
+Latitude: 33.977092
+Longitude: -118.4092133
+
+Google, Mountain View, Santa Clara County, California, United States
+Type: commercial
+Latitude: 37.419000999999994
+Longitude: -122.08237596053958
+
+Google, 150, Broadway, East Cambridge, Cambridge, Middlesex County, Massachusetts, 02142, United States
+Type: company
+Latitude: 42.3642662
+Longitude: -71.0887198
+
+Googal, Devadurga taluk, Raichur District, Karnataka, India
+Type: village
+Latitude: 16.4693278
+Longitude: 77.1442219
+
+Google, Kirkland, King County, Washington, United States
+Type: commercial
+Latitude: 47.6705578
+Longitude: -122.19707375045999
+
+```
+
+
+
+### Solution {.unnumbered}
+
+```python
+import requests
+import sys
+
+url = "https://nominatim.openstreetmap.org/search.php"
+
+def search(q):
+    params = {"q": q, "format": "jsonv2"}
+    result = requests.get(url, params=params).json()
+    for entry in result:
+        print(entry['display_name'])
+        print("Type:", entry['type'])
+        print("Latitude:", entry['lat'])
+        print("Longitude:", entry['lon'])
+        print("")
+
+name = sys.argv[1]
+search(name)
+```
+
+
+
+
+
+
+## Frankfurter Exchange Rates
+
+Write a program `frankfurter.py` to list the historical currency rate of a currency against a base currency using [Frankfurter Exchange Rate API][1].
+
+[1]: https://www.frankfurter.app/docs/
+
+The program should take the following command-line arguments.
+
+```
+  -c CURRENCY, --currency CURRENCY
+                        target currency, default INR
+  -b BASE, --base BASE  base currency, default USD
+  -d DATE, --date DATE  First date to consider, default yesterday
+  -n DAYS, --days DAYS  number of days to display
+```
+
+The program should display the curreny rate between the base currency and the target currency for `n` days starting from yesterday. Optionally, the start date could be provided as a command-line argument.
+
+Please note that there convertion data is not available on weekends. So the number of rows of data shown may be less than `n`.
+
+## The Output Format
+
+The output needs to be properly tabulated. Please use Python library `tabulate` for doing this.
+
+Please refer to [Printing Tables with Tabulate][h2] in the Python Cookbook to learn how to the the `tabulate` library.
+
+
+## Usage
+
+```
+$ python frankfurter.py
+Date          USD    INR
+----------  -----  -----
+2023-10-18      1  83.25
+2023-10-17      1  83.22
+2023-10-16      1  83.25
+2023-10-13      1  83.27
+2023-10-12      1  83.24
+2023-10-11      1  83.18
+2023-10-10      1  83.24
+2023-10-09      1  83.3
+```
+
+```
+$ python frankfurter.py -n 2
+Date          USD    INR
+----------  -----  -----
+2023-10-18      1  83.25
+2023-10-17      1  83.22
+```
+
+```
+$ python frankfurter.py -b GBP
+Date          GBP     INR
+----------  -----  ------
+2023-10-18      1  101.55
+2023-10-17      1  101.31
+2023-10-16      1  101.37
+2023-10-13      1  101.41
+2023-10-12      1  102.47
+2023-10-11      1  102.24
+2023-10-10      1  101.96
+2023-10-09      1  101.39
+```
+
+```
+$ python frankfurter.py -b GBP -c USD
+Date          GBP     USD
+----------  -----  ------
+2023-10-18      1  1.2198
+2023-10-17      1  1.2173
+2023-10-16      1  1.2176
+2023-10-13      1  1.2178
+2023-10-12      1  1.231
+2023-10-11      1  1.2292
+2023-10-10      1  1.2249
+2023-10-09      1  1.2172
+```
+
+```
+$ python frankfurter.py -d 2023-01-31
+Date          USD    INR
+----------  -----  -----
+2023-01-31      1  81.82
+2023-01-30      1  81.53
+2023-01-27      1  81.61
+2023-01-26      1  81.53
+2023-01-25      1  81.57
+2023-01-24      1  81.62
+2023-01-23      1  81.36
+```
+
+## Hints
+
+* See [Working with dates][h1] in the Python Cookbook.
+* See [Printing Tables with Tabulate][h2] in the Python Cookbook.
+
+[h1]: https://perfios-lab.pipal.in/notes/cookbook/dates.html
+[h2]: https://perfios-lab.pipal.in/notes/cookbook/tabulate.html
+
+
+### Solution {.unnumbered}
+
+```python
+import argparse
+import datetime
+import requests
+from tabulate import tabulate
+
+p = argparse.ArgumentParser()
+p.add_argument("-c", "--currency", help="currency to list, default INR", default="INR")
+p.add_argument("-b", "--base", help="base currency, default USD", default="USD")
+p.add_argument("-d", "--date", help="starting date, default yesterday", type=datetime.date.fromisoformat)
+p.add_argument("-n", "--days", help="number of days to display", type=int, default=10)
+
+args = p.parse_args()
+
+yday = datetime.date.today() - datetime.timedelta(days=1)
+start_date = args.date or yday
+
+date2 = start_date - datetime.timedelta(days=args.days)
+
+url = f"https://api.frankfurter.app/{date2}..{start_date}"
+params = {"base": args.base, "to": args.currency}
+
+result = requests.get(url, params=params).json()
+
+headers = ["Date", args.base, args.currency]
+data = [[date, 1.0, value[args.currency]] for date, value in result['rates'].items()][::-1]
+
+print(tabulate(data, headers=headers))
+```
+
+
+
+
+
+
+## PyPI Releases
+
+## Overview
+
+Python Package Index (PyPI) maintains an index of all the third-party python packages. It also provides an API to look at all the releases of a package.
+
+Write a command line program ``pypi-releases.py` to list all the releases of a given package using the PyPI API.
+
+The program should take the package name as argument and list all the releases along with the release time and filename uploaded for that release, in the reverse chronological order of the release time. By default, it should show the recent 5 releases.
+
+The program should accept the following optional command-line arguments.
+
+```
+-n --count     number of releases to show
+-b --before    only show release on or before this date
+-a --after     only show releases that are on or after this date
+-r --reverse   show the release in the reverse order - old releases first
+```
+
+You can use the  `upload_time` as an approximation for the release time. Typically, there would multiple files uploaded for each release and all of them will be listed in the response of the API. Please use first entry where the `packagetype` is `sdist`. If a release does not have an entry with `packagetype` with value `sdist`, please ignore that release.
+
+## The PyPI API
+
+The [PYPI API documentation][1] has two endpoints. The first one is to fecth the information about all releases of a project or a package. The second one is to get information about one particular release. We are only interested in the first one.
+
+The following is the URL for getting information about releases of python package `Flask`. You can replace `Flask` with any package name to get information about that package.
+
+<https://pypi.org/pypi/Flask/json>
+
+You'll have to explore the API response and figure out which part of the data that you need to take.
+
+Hint: You just need to focus on the `releases` part of the response.
+
+## The Output Format
+
+The output needs to be properly tabulated. Please use Python library `tabulate` for doing this.
+
+Please refer to [Printing Tables with Tabulate][h2] in the Python Cookbook to learn how to the the `tabulate` library.
+
+[h2]: https://perfios-lab.pipal.in/notes/cookbook/tabulate.html
+
+
+## Sample Usage
+
+```
+$ python pypi-releases.py Flask
+Package    Version    Release Date         Filename
+---------  ---------  -------------------  ------------------
+Flask      3.0.0      2023-09-30T14:36:12  flask-3.0.0.tar.gz
+Flask      2.3.3      2023-08-21T19:52:35  flask-2.3.3.tar.gz
+Flask      2.2.5      2023-05-02T14:42:36  Flask-2.2.5.tar.gz
+Flask      2.3.2      2023-05-01T15:42:12  Flask-2.3.2.tar.gz
+Flask      2.3.1      2023-04-25T21:20:31  Flask-2.3.1.tar.gz
+```
+
+```
+$ python pypi-releases.py Flask -b 2022-06
+Package    Version    Release Date         Filename
+---------  ---------  -------------------  ------------------
+Flask      2.1.2      2022-04-28T17:47:40  Flask-2.1.2.tar.gz
+Flask      2.1.1      2022-03-30T21:38:32  Flask-2.1.1.tar.gz
+Flask      2.1.0      2022-03-28T19:15:15  Flask-2.1.0.tar.gz
+Flask      2.0.3      2022-02-14T20:01:09  Flask-2.0.3.tar.gz
+Flask      2.0.2      2021-10-04T14:34:54  Flask-2.0.2.tar.gz
+```
+
+```
+$ python pypi-releases.py Flask -a 2022-06 -r
+Package    Version    Release Date         Filename
+---------  ---------  -------------------  ------------------
+Flask      2.1.3      2022-07-13T20:56:00  Flask-2.1.3.tar.gz
+Flask      2.2.0      2022-08-02T00:14:12  Flask-2.2.0.tar.gz
+Flask      2.2.1      2022-08-03T23:52:25  Flask-2.2.1.tar.gz
+Flask      2.2.2      2022-08-08T23:26:33  Flask-2.2.2.tar.gz
+Flask      2.2.3      2023-02-15T22:43:57  Flask-2.2.3.tar.gz
+```
+
+
+
+### Solution {.unnumbered}
+
+```python
+
+```
+
+
+
+
+

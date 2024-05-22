@@ -25,6 +25,8 @@ book:
       chapters:
         - assignments/assignment-01.qmd
         - assignments/assignment-02.qmd
+        - assignments/assignment-03.qmd
+        - assignments/assignment-04.qmd
     - part: Live Notes
       href: live-notes/index.qmd
       chapters:
